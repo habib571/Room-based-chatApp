@@ -17,7 +17,7 @@ class ButtonOnboarding extends GetView<OnboardingControllerImp> {
             textColor: Colors.white,
             color: Colors.blue, 
             
-            child:    const Text("continue", 
+            child:    const Text("connnnnnnnnntinue", 
             style: TextStyle( 
               fontWeight: FontWeight.bold
             )
