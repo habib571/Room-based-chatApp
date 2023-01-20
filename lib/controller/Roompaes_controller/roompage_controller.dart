@@ -1,39 +1,149 @@
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart'; 
 import 'package:cloud_firestore/cloud_firestore.dart'; 
+import 'package:revi/model/Room.dart';
 
+import '../auth/auth_controller.dart';
 
 
 abstract class RoomPageController extends GetxController{
 createroom(); 
-addroom(String name,token) ; 
+addroom(String name,token) ;   
+addtoMyroomsAdmin(String name ,token) ; 
+addtoMyroomsJoined(String name ,token) ; 
+
+deleteRoom() ;
+Stream<QuerySnapshot<Map<String,dynamic>>>getRoomAdmin( ) ;  
+Stream<QuerySnapshot<Map<String,dynamic>>>getRoomJoined() ;     
+gettVerif(String verifT) ; 
+bool checkToken(bool check) ;
+
+
+
+
+ FirebaseFirestore firestore = FirebaseFirestore.instance ;  
+ 
+
 
 //late TextEditingController roomname;
-final roomname=TextEditingController();
+final roomname=TextEditingController(); 
+final enteredtoken = TextEditingController() ; 
+final verifToken =TextEditingController() ;
 
 }
-class RoomPageControllerImp extends RoomPageController{
+class RoomPageControllerImp extends RoomPageController{ 
+  User? get user =>AuthController.currentUser(); 
   GlobalKey<FormState> formstate= GlobalKey<FormState>();
   @override 
-addroom(String name ,token ) {  
-  DocumentReference Rname = FirebaseFirestore.instance.collection('rooms').doc('roomname') ;  
-   DocumentReference tokens = FirebaseFirestore.instance.collection('rooms').doc('token') ;  
-    Rname.set({ 
-      'roomname' :name 
-    }).then((value) => print("added"))
-    .catchError((error) => print("Failed to add user: $error")); 
-    tokens.set({ 
-      'token' :token
-    }).then((value) => print("added"))
-    .catchError((error) => print("Failed to add user: $error"));
+ Future<void> addroom(String name ,token )  async {   
+  final room =Room(
+    token: token, 
+    roomname: name
+    );
 
 
+   await  firestore
+         .collection('rooms')
+         .add(room.toJson()) ;
+    
+} 
 
-}
+
+  @override 
+   Future<void> addtoMyroomsAdmin(String name, token)  async{ 
+    final room =Room(
+    token: token, 
+    roomname: name
+    ); 
+    await firestore 
+       .collection('users')
+       .doc(user!.uid)
+       .collection('myroomsAdmin')
+       .add(room.toJson()) ;
+
+    
+    
+  }
+  @override 
+   Future<void> addtoMyroomsJoined(String name, token)  async { 
+    final room =Room(
+    token: token, 
+    roomname: name
+    ); 
+    await firestore 
+       .collection('users')
+       .doc(user!.uid)
+       .collection('myroomsJoined') 
+       .add(room.toJson()) ;
+
+    
+    
+  } 
+  @override 
+   getRoomAdmin() {   
+
+    return firestore 
+           .collection('users') 
+           .doc(user!.uid) 
+           .collection('myroomsAdmin')
+           
+           
+           .snapshots();
+   
+  }  
+  @override 
+  getRoomJoined() { 
+    return firestore 
+           .collection("users") 
+           .doc(user!.uid)
+           .collection('myroomsJoined')
+           .snapshots(); 
+
+  } 
+  @override
+  Future<void> gettVerif(String verifT)  async{   
+       
+      firestore
+    .collection('rooms')
+     .get()
+    .then((QuerySnapshot querySnapshot) { 
+    for (var doc in querySnapshot.docs) {    
+
+
+      if(verifT==doc['token']) 
+      {     
+        addtoMyroomsJoined(doc['roomname'].toString(), doc['token'].toString()) ; 
+      } 
+    }})  ;
+   
+    
  
+   }  
+   @override 
+   bool checkToken( bool check) { 
+     check =false ;
  
+      firestore
+    .collection('rooms')
+     .get()
+    .then((QuerySnapshot querySnapshot) { 
+    for (var doc in querySnapshot.docs) {    
+
+      if(verifToken.text==doc['token']) {     
+        check =!check ;
+      }  
+     
+    }})  ; 
+    return check ;
+  }
+ 
+ @override 
+ deleteRoom() {
+ }
+
 
 
   @override
@@ -51,8 +161,13 @@ addroom(String name ,token ) {
   }
   @override
   void dispose() {
-roomname.dispose();
+roomname.dispose(); 
+enteredtoken.dispose() ;  
+verifToken.dispose() ;
+
 
     super.dispose();
-  } 
+  }
+  
+   
 }

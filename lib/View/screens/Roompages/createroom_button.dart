@@ -14,7 +14,7 @@ class createroombutton extends StatelessWidget {
     required this.onPressed,
      }) : super(key: key);
 
-//List<Widget> bodyElements = [];
+
 int num = 0;
 @override
  Widget build(BuildContext context) {
@@ -22,7 +22,7 @@ int num = 0;
       onPressed: onPressed,
       
       tooltip: 'create a new room',
-      child: const Icon(Icons.add),
+      child: const Icon(Icons.group_add_rounded),
     );
 
      

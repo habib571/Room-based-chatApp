@@ -31,13 +31,13 @@ class _RoomPageState extends State<RoomPage>
       appBar: AppBar(
         title: Text(
           'Rooms Page',
-          style: TextStyle(fontSize: 27, color: colorstheme),
+          style: TextStyle(fontSize: 16, color: colorstheme),
         ),
         centerTitle: true,
         shadowColor: const  Color.fromARGB(0, 136, 54, 54),
         leading: Padding(
           padding:  const EdgeInsets.only(left:15.0),
-          child: IconButton(
+          child:  IconButton(
             icon: Icon(
               Icons.arrow_back,
               color: colorstheme,
@@ -47,7 +47,21 @@ class _RoomPageState extends State<RoomPage>
                              Get.back() ;
                             },
           ),
-        ),
+        ), 
+        actions: [ 
+          IconButton(
+            onPressed: (){ 
+
+            },
+             icon:const  Icon(Icons.logout_rounded)
+             ) ,
+          IconButton(
+            onPressed: (() {
+              
+            }), 
+            icon: const Icon(Icons.more_vert) 
+            )
+        ],
       ),
       body: Column(
         children: [ 

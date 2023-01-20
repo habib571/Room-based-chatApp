@@ -39,7 +39,7 @@ class SplashScreen extends StatelessWidget {
                  
                     
                   onPressed: () { 
-                  Get.offNamed(Approuter.onboarding) ;
+                  Get.offNamed(Approuter.login) ;
                   }  ,
                   
                   child: const Text(

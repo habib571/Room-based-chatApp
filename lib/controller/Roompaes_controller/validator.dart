@@ -10,4 +10,14 @@ if(!GetUtils.isUsername(val)){
 }
  if(val.isEmpty){return "cannot be empty";}       //____________________CONDITION OF THE TEXTFORMFEILD_______________
 
+} 
+
+validTokenInput(String val, bool check) { 
+ if(!check) { 
+   return "Check Your token " ;
+ }  
+ if(val.isEmpty) { 
+  return "Connot Be Empty" ;
+ }
+
 }

@@ -1,6 +1,9 @@
 
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';   
+import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:get/get.dart';
+import 'package:revi/controller/Roompaes_controller/roompage_controller.dart';    
+import 'package:revi/model/Room.dart' ; 
 
 
 
@@ -8,40 +11,52 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 
 
 
- class RoomCardBO extends StatelessWidget{
-  const RoomCardBO( {super.key, 
-  required this.height ,  
-  required this.width ,
-   required this.text,  
-   required this.token  ,
-   
+
+ class RoomCard extends StatelessWidget{
+  const RoomCard( {super.key, 
+  
+  required this.room
   
   }
   );  
-  
-  final double height ;   
-  final double width ;
-  final String text ;  
-  final String token ; 
-  
+  final Room room ;
+   
 
 
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) { 
+    RoomPageControllerImp ctrl =Get.put(RoomPageControllerImp()) ;
     return Padding(
       padding:  const EdgeInsets.symmetric(vertical: 15 ,horizontal: 50) ,
-      child:
-      InkWell(  
+      child :   
+      InkWell( 
         onTap: () {
-          
+        
         },
-        child :
+      child :
+      Slidable(
+        endActionPane: ActionPane(
+          motion: const StretchMotion(),
+          children: [
+            SlidableAction( 
+              
+              onPressed: ctrl.deleteRoom(),
+              icon: Icons.delete,
+              backgroundColor: Colors.red.shade300,
+              borderRadius: BorderRadius.circular(30),
+            )
+          ],
+        
+        ),
+        
+      child:
+      
        Container(
-        height:  height,                                                       //____ ELEMENTS__________
-        width:  width,
+        height:  250,                                                       //____ ELEMENTS__________
+        width:  250,
         decoration: BoxDecoration(
-          color:Color.fromARGB(223, 24, 109, 88), 
+          color:const Color.fromARGB(223, 24, 109, 88), 
           borderRadius: BorderRadius.circular(30),
         ), 
         child: InkWell(  
@@ -72,7 +87,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 
             ) ,
            Text( 
-             text , 
+             room.roomname , 
              style: const  TextStyle( 
               fontSize: 20, 
               fontWeight: FontWeight.bold ),
@@ -96,7 +111,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 
             ),
         SelectableText( 
-             token ,
+             room.token ,
              style: const  TextStyle( 
               fontSize: 16, 
                )
@@ -108,6 +123,6 @@ import 'package:flutter_slidable/flutter_slidable.dart';
         )
         ),
       ),
-       )   ); 
+     ) )); 
   }
 }

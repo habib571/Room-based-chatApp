@@ -5,7 +5,7 @@ import 'package:hive/hive.dart';
 
 
 import 'package:revi/View/screens/Roompages/createroom_button.dart';
-import 'package:revi/View/widgets/roompage/RoomBM_widget.dart';  
+import 'package:revi/View/widgets/roompage/Room_widget.dart';  
 
 import 'package:revi/View/widgets/roompage/textformfield.dart';
 import 'package:revi/controller/Roompaes_controller/roompage_controller.dart'; 
@@ -13,9 +13,14 @@ import 'package:revi/controller/Roompaes_controller/validator.dart';
 import 'package:revi/data/datasource/local_storage/lcoal_storage_respostior.dart'; 
 import 'package:revi/model/token.dart';
 
+import '../../../model/Room.dart';
+
 
  class RoomPageBM extends StatefulWidget {
-  const RoomPageBM({super.key});
+  const RoomPageBM({super.key  ,
+       
+  });
+
 
   @override
   State<RoomPageBM> createState() => _RoomPageBMState();
@@ -27,28 +32,16 @@ class _RoomPageBMState extends State<RoomPageBM> {
  
   GlobalKey<FormState> formstate= GlobalKey<FormState>();   
   RoomPageControllerImp roomPageController = Get.put(RoomPageControllerImp()) ;  
-  final _mybox = Hive.box("mybox") ; 
-  RoomsDataBase db =RoomsDataBase() ; 
- @override 
-  void initState() {
-    
-     if(_mybox.get("RoomsList") ==null ) {
-      db.createInitialData() ;
-     }  
-     else {
-      db.GetData();
-     }
-      super.initState() ; 
-  }
-
-
- 
   
+ 
+ 
+ 
+
 
 int num = 0;
 String passwod ="" ;
 String name ="" ;
-
+ List<Room> _list = [] ;
   Future <String?>openDialog()=>showDialog<String>(context: context, builder: (context)=>AlertDialog(
     title: const Text("The room name"),
     content: 
@@ -90,26 +83,20 @@ String name ="" ;
   Navigator.of(context).pop(roomPageController.roomname.text);   
 
 
-  setState(()   {  
+  setState(()   {   
      
     name=(roomPageController.roomname).text;   
      passwod = token.GenToken(); 
-    db.roomsList.add([name, passwod]) ;
     roomPageController.roomname.clear();   
-      db.Updatedatabase() ;  
+    
       roomPageController.addroom(name ,passwod)  ;
  
   } );  
   
-  db.Updatedatabase() ; 
+  
   
    } 
-   void deleteRoom(int index) {
-    setState(() {
-      db.roomsList.removeAt(index);
-    });
-    db.Updatedatabase();
-  } 
+   
 
   
   @override
@@ -121,26 +108,58 @@ String name ="" ;
         openDialog();
       },),
 
-       body:   
-        ListView.builder( 
-        itemCount: db.roomsList.length,   
-        itemBuilder: (context, index) {
-          return RoomCardBM(
-            height: 250,
-             width: 250, 
-             text:  db.roomsList[index][0] , 
-             token: db.roomsList[index][1], 
-             delete: (context)=> deleteRoom(index)
-          );
-           
-        },
+      body: StreamBuilder(
+          stream: roomPageController.getRoomAdmin(),  
+          builder: ((context, snapshot) {  
+            
+            switch(snapshot.connectionState) { 
+              
+              case ConnectionState.waiting:
+                        case ConnectionState.none:
+                         return const Center(
+                          child: CircularProgressIndicator());
+
+                        //if some or all data is loaded then show it
+                        case ConnectionState.active:
+                        case ConnectionState.done: 
+                         final data = snapshot.data?.docs ; 
+                         _list = data?.map((e) => Room.fromJson(e.data()) ).toList() ??[] ; 
+                          
+                            
+                             if(_list.isNotEmpty)  { 
+                              return
+
+                           ListView.builder( 
+                            physics: const BouncingScrollPhysics(), 
+                            itemCount: _list.length,
+                            itemBuilder: (context, index) {
+                               return RoomCard(room: _list[index]) ;
+
+                            }
+
+                          ); 
+                             
+                  
+                         
+            }         
+            else {  
+              return const Center( 
+                child: Text('No rooms Found !' ,
+                 style:  TextStyle( fontSize: 25)
+                  ),
+              );
+
+            } 
+            
+    }  }),
+      ) ,
         
 
         
           
         
         
-        )
+        
 
      );
   }

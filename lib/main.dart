@@ -5,24 +5,24 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 //import 'package:revi/controller/auth/auth_controller.dart';
 import 'package:revi/routing/router.dart'; 
-import 'View/widgets/roompage/RoomBM_widget.dart';
+import 'View/widgets/roompage/Room_widget.dart';
 import 'firebase_options.dart'; 
 import 'package:hive/hive.dart' ;  
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive_flutter/hive_flutter.dart'; 
+import 'package:flutter/services.dart';
 //import 'package:revi/View/widgets/roompage/RoomCard.dart';
 
-
+late Size mq ;
 
 void main() async{ 
- WidgetsFlutterBinding.ensureInitialized() ;  
+ WidgetsFlutterBinding.ensureInitialized() ;   
+ SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky); 
+ SystemChrome.setPreferredOrientations(
+          [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]) ;
  await Firebase.initializeApp(
-
   options: DefaultFirebaseOptions.currentPlatform,
-
-
  ) ;  
- await Hive.initFlutter() ; 
-  var box = await Hive.openBox('mybox');
+ 
  
   
  

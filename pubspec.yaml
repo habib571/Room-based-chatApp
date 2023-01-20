@@ -46,6 +46,10 @@ dependencies:
   hive_flutter: ^ 1.1.0
   flutter_slidable: ^2.0.0
   cloud_firestore: ^4.1.0
+  image_picker: ^0.8.6
+  cached_network_image: ^3.2.3
+  firebase_storage: ^11.0.8
+  emoji_picker_flutter: ^1.5.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -14,11 +14,13 @@ class CustomTextForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  TextFormField(
+    return  TextFormField( 
+    
              autovalidateMode: AutovalidateMode.always,
              validator: valid,
               controller:mycontroller,
-              decoration: InputDecoration(
+              decoration: InputDecoration( 
+              
                 hintText: hinttext,
                 hintStyle: const TextStyle(fontSize: 14),
                // label: Text(labeltext),

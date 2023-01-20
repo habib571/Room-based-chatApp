@@ -16,7 +16,7 @@ import 'package:get/get.dart';
         child:  Column(children: [ 
           const Expanded(  
             flex: 2,
-            child: SliderOnboarding()
+            child: SliderOnboarding()    
             
     ),  
     

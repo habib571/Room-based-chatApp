@@ -24,13 +24,15 @@ class SignIn extends StatefulWidget {
 
 class _SignInState extends State<SignIn> {  
 late TextEditingController emailcontroller =TextEditingController() ; 
-late TextEditingController passwordcontroller =TextEditingController() ;
+late TextEditingController passwordcontroller =TextEditingController() ; 
+late TextEditingController usernameC =TextEditingController() ;
   bool passwordVisibility = true;   
  
   @override 
   void dispose() {
     emailcontroller.dispose() ;
-    passwordcontroller.dispose() ; 
+    passwordcontroller.dispose() ;
+    usernameC.dispose() ;
     super.dispose() ;
   } 
   @override
@@ -74,8 +76,16 @@ late TextEditingController passwordcontroller =TextEditingController() ;
                      height: 180,
                      alignment:Alignment.center,),
                   ),  
-                  const  SizedBox(height: 150) ,
-                  
+                  const  SizedBox(height: 100) ,
+                  MyTextField( 
+                      label: "Username",
+                      hintText: 'Enter your Username',
+                      inputText: TextInputType.name,
+                      textEditingController:usernameC
+                        ) , 
+                        const SizedBox( 
+                          height: 20,
+                        ) ,
         
                            
                            MyTextField( 
@@ -202,6 +212,7 @@ late TextEditingController passwordcontroller =TextEditingController() ;
   _signIn() async {
     var email = emailcontroller.text.trim();
     var pw = passwordcontroller.text.trim();
+    var usern = usernameC.text.trim() ;
 
    if (email.isEmpty || pw.isEmpty) {
       await showOkAlertDialog(
@@ -214,7 +225,9 @@ late TextEditingController passwordcontroller =TextEditingController() ;
     var obj =  await AuthController.signIn(email, pw);
 
     if (obj is User) { 
-      Get.toNamed(Approuter.home) ;
+     await   AuthController.createUser(usern).then((value) { 
+      Get.toNamed(Approuter.home) ; 
+    });
       
     } else {
       await showOkAlertDialog(

@@ -37,7 +37,7 @@ class _SignupState extends State<Signup> {
     emailC.dispose() ;
     passwordC.dispose() ;
     passwordConfirmC.dispose() ; 
-   usernameC.dispose() ;
+   
   
     super.dispose(); 
     
@@ -114,18 +114,11 @@ class _SignupState extends State<Signup> {
                       ), 
                       textAlign: TextAlign.center,
                       ) ,  
-                     const SizedBox(height: 30,),
+                     const SizedBox(height: 50,),
                      
                      
-                     MyTextField( 
-                      label: "Username",
-                      hintText: 'Enter your Username',
-                      inputText: TextInputType.name,
-                      textEditingController:usernameC
-                        ) , 
-                        const SizedBox( 
-                          height: 20,
-                        ) ,
+                     
+                       
                         
                          
                            MyTextField( 
@@ -213,12 +206,8 @@ class _SignupState extends State<Signup> {
     var pw = passwordC.text.trim();
     var pwConfirm = passwordConfirmC.text.trim();    
     var usern = usernameC.text.trim() ;
-    DocumentReference users =   FirebaseFirestore.instance.collection('users').doc("username") ; 
-    users.set({ 
-      'username' :usern 
-    }).then((value) => print("added"))
-    .catchError((error) => print("Failed to add user: $error"));
-
+    
+     
 
     if (email.isEmpty || pw.isEmpty || pw != pwConfirm || usern.isEmail) {
       await showOkAlertDialog(

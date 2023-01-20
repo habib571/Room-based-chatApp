@@ -1,21 +1,24 @@
 
 
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:get/get.dart';
+
 
 import 'package:flutter/material.dart'; 
-import 'package:revi/View/screens/auth/signup screen.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:revi/model/chat-user.dart';
 
 //import 'package:revi/routing/router_const.dart';
-class AuthController  { 
-
- static final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+class AuthController  {  
+  static final FirebaseFirestore firestore =FirebaseFirestore.instance ;
+  
+ static final FirebaseAuth firebaseAuth = FirebaseAuth.instance; 
+   static User get user =>firebaseAuth.currentUser!;
 
   static Future<dynamic> signUp(String email, String password) async {
     try {
-      UserCredential userCredential = await _firebaseAuth
+      UserCredential userCredential = await firebaseAuth
           .createUserWithEmailAndPassword(email: email, password: password);
 
       return userCredential.user;
@@ -36,11 +39,11 @@ class AuthController  {
   }
 
   static Future<void> signOut() async {
-    await _firebaseAuth.signOut();
+    await firebaseAuth.signOut();
   }
 
   static Future<void> resetPassword(String email) async {
-    await _firebaseAuth.sendPasswordResetEmail(email: email);
+    await firebaseAuth.sendPasswordResetEmail(email: email);
   }
 
   static Future<FirebaseApp> initializeFirebase({
@@ -53,7 +56,27 @@ class AuthController  {
   static User? currentUser() {
     return FirebaseAuth.instance.currentUser;
   }  
+   getProfilEmailImage()  {
+    if(firebaseAuth.currentUser!.photoURL !=null) {
+      return Image.network('$firebaseAuth.currentUser!.photoURL');
+    } else {
+      return const Icon(Icons.account_circle) ;
+    }
+   } 
+  static Future<void> createUser(String name)  async { 
+    final chatUser =ChatUser(
+      name: name,
+       email: user.email.toString(),
+        id:  user.uid
+        ); 
+       return await  firestore 
+        .collection('users')
+        .doc(user.uid) 
+        .set(chatUser.toJson()) ;
+        
 
+
+   }
 
 
 } 
