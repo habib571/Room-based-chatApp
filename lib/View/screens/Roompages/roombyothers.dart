@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -5,7 +6,8 @@ import 'package:revi/View/screens/Roompages/createroom_button.dart';
 import 'package:revi/View/widgets/roompage/textformfield.dart';
 import 'package:revi/controller/Roompaes_controller/roompage_controller.dart'; 
 import 'package:revi/controller/Roompaes_controller/validator.dart';
-import 'package:revi/data/datasource/local_storage/lcoal_storage_respostior.dart'; 
+import 'package:revi/data/datasource/local_storage/lcoal_storage_respostior.dart';
+import 'package:revi/model/chat-user.dart'; 
 import 'package:revi/model/token.dart';
 
 import '../../../model/Room.dart';
@@ -13,7 +15,13 @@ import '../../widgets/roompage/Room_widget.dart';
 
 
  class RoomPageBO extends StatefulWidget {
-  const RoomPageBO({super.key});
+  const RoomPageBO({super.key , 
+  
+   required this.user 
+  
+   }); 
+  final  ChatUser user ;
+
 
   @override
   State<RoomPageBO> createState() => _RoomPageBOState();
@@ -24,7 +32,7 @@ class _RoomPageBOState extends State<RoomPageBO> {
   
  
   GlobalKey<FormState> formstate= GlobalKey<FormState>();   
-  RoomPageControllerImp roomPageController = Get.put(RoomPageControllerImp()) ;  
+  RoomPageControllerImp roomPageController = Get.put(RoomPageControllerImp()) ;   
    
  
   
@@ -118,7 +126,7 @@ List<Room> _list =[] ;
                             physics: const BouncingScrollPhysics(), 
                             itemCount: _list.length,
                             itemBuilder: (context, index) {
-                               return RoomCard(room: _list[index]) ;
+                               return RoomCard(room: _list[index], user: widget.user,) ; 
 
                             }
 

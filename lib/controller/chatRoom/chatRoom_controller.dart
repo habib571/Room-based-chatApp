@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dart:developer';
 import 'dart:io';
@@ -5,33 +6,47 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:revi/controller/auth/auth_controller.dart';
+import 'package:revi/model/Room.dart';
 import 'package:revi/model/chat-user.dart';
 import 'package:firebase_storage/firebase_storage.dart' ;
 import '../../model/message.dart';
-  class ChatRoomcontroller extends GetxController {    
+  class ChatRoomcontroller extends GetxController {      
+  TextEditingController inp =TextEditingController() ; 
+  @override 
+   void dispose() { 
+    inp.dispose() ;
+    super.dispose();
+   }
+  
+
      static User? get user =>AuthController.currentUser(); 
-   late  ChatUser me ;  
+   
+   
 
    static String getConversationID(String id) => user!.uid.hashCode <= id.hashCode
       ? '${user!.uid}_$id'
       : '${id}_${user!.uid}';
  Stream<QuerySnapshot<Map<String, dynamic>>> getAllMessages(
-      ChatUser user) {
-    return FirebaseFirestore.instance
-        .collection('chats/${getConversationID(user.id)}/messages/')
-        .orderBy('sent', descending: true)
-        .snapshots();
-  }
+      ChatUser user) {  
+        
+          return FirebaseFirestore.instance
+      .collection('chats/${getConversationID(user.id)}/messages/')
+      .orderBy('sent', descending: true)
+            .snapshots();
+        }  
+        
+
 
   // for sending message
- Future<void> sendMessage(
+ Future<void> sendMessage( 
+  Room room,
       ChatUser chatUser, String msg, Type type) async {
     //message sending time (also used as id)
     final time = DateTime.now().millisecondsSinceEpoch.toString();
 
     //message to send
     final Message message = Message(
-        toId: chatUser.id,
+        toId: room.roomname,
         msg: msg,
         read: '',
         type: type,
@@ -62,7 +77,7 @@ import '../../model/message.dart';
   }
 
   //send chat image
- Future<void> sendChatImage(ChatUser chatUser, File file) async {
+ Future<void> sendChatImage( Room room ,ChatUser chatUser, File file) async {
     //getting image file extension
     final ext = file.path.split('.').last;
 
@@ -79,7 +94,7 @@ import '../../model/message.dart';
 
     //updating image in firestore database
     final imageUrl = await ref.getDownloadURL();
-    await sendMessage(chatUser, imageUrl, Type.image);
+    await sendMessage(room,chatUser, imageUrl, Type.image);
   }
 }
 

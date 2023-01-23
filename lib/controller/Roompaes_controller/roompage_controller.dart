@@ -13,7 +13,8 @@ abstract class RoomPageController extends GetxController{
 createroom(); 
 addroom(String name,token) ;   
 addtoMyroomsAdmin(String name ,token) ; 
-addtoMyroomsJoined(String name ,token) ; 
+addtoMyroomsJoined(String name ,token) ;  
+Stream<QuerySnapshot<Map<String,dynamic>>> getRoomInfo(Room room) ;
 
 deleteRoom() ;
 Stream<QuerySnapshot<Map<String,dynamic>>>getRoomAdmin( ) ;  
@@ -138,6 +139,14 @@ class RoomPageControllerImp extends RoomPageController{
      
     }})  ; 
     return check ;
+  } 
+  @override 
+  Stream<QuerySnapshot<Map<String, dynamic>>> getRoomInfo(Room room) { 
+    return firestore
+    .collection('rooms')
+    .where('roomname' ,isEqualTo: room.roomname) 
+    .snapshots() ;
+
   }
  
  @override 

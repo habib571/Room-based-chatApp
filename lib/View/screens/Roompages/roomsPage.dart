@@ -1,10 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:revi/View/screens/Roompages/roomByme.dart';
-import 'package:revi/View/screens/Roompages/roombyothers.dart'; 
+import 'package:revi/View/screens/Roompages/roombyothers.dart';
+import 'package:revi/model/Room.dart';
+import 'package:revi/model/chat-user.dart'; 
 
 
 class RoomPage extends StatefulWidget {
+  const RoomPage({super.key, 
+  required this.user ,
+
+  
+  }); 
+ 
+   final ChatUser user ;
+
 
   @override
   _RoomPageState createState() => _RoomPageState();
@@ -18,7 +28,7 @@ class _RoomPageState extends State<RoomPage>
 
   @override
   void initState() {
-    _tabController =  TabController(length: 2, vsync: this, initialIndex: 0)
+    _tabController =  TabController(length: 2, vsync: this, initialIndex: 0) 
       ..addListener(() {});
     super.initState();
   }
@@ -92,9 +102,9 @@ class _RoomPageState extends State<RoomPage>
           ),
           Expanded(
             child: TabBarView(
-              controller: _tabController, children: const[
-              RoomPageBM() ,
-              RoomPageBO()
+              controller: _tabController, children: [
+              RoomPageBM( user: widget.user) ,
+              RoomPageBO(user: widget.user,)
           
             ]),
           )

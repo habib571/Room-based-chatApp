@@ -1,4 +1,4 @@
-/*import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:revi/controller/Roompaes_controller/roompage_controller.dart' ;
 import 'package:revi/model/Room.dart'; 
@@ -20,7 +20,7 @@ class _ChatAppBarState extends State<ChatAppBar> {
     return InkWell( 
       onTap: (){}, 
       child: StreamBuilder(      
-        stream: ctrl.getRoomInfo(widget.room) ,
+        stream: ctrl.getRoomInfo(widget.room),
         builder:((context, snapshot) {
           final data =snapshot.data!.docs ; 
           final list = data.map((e) => Room.fromJson(e.data())).toList() ; 
@@ -31,7 +31,7 @@ class _ChatAppBarState extends State<ChatAppBar> {
                }) ,
                 icon: const Icon(Icons.arrow_back, color: Colors.green,)
                 ), 
-                Text(  list.isNotEmpty? list[0].roomname :widget.room.roomname, 
+                Text(  list.isNotEmpty? list[0].roomname:widget.room.roomname, 
                 style: const TextStyle( 
                   fontSize: 20, 
                   color:  Colors.black,
@@ -50,4 +50,4 @@ class _ChatAppBarState extends State<ChatAppBar> {
          ),
     );
   }
-}*/
+}

@@ -1,20 +1,24 @@
+import 'dart:io';
+
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart'; 
 import 'package:revi/View/widgets/chatRoom/Appbar_chat.dart' ; 
 import 'package:revi/View/widgets/chatRoom/ChatInput.dart'; 
 import 'package:revi/View/widgets/chatRoom/greenMessage.dart';
 import 'package:revi/View/widgets/chatRoom/Bluemessage.dart'; 
-/*import 'package:revi/View/widgets/chatRoom/messageCard.dart';
+import 'package:revi/View/widgets/chatRoom/messageCard.dart';
 import 'package:revi/controller/chatRoom/chatRoom_controller.dart';
 import 'package:revi/model/chat-user.dart';
 import 'package:revi/main.dart';
 import '../../../model/Room.dart';
 import '../../../model/message.dart'; 
+// ignore: must_be_immutable
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({super.key ,required this.room ,required this.user});
+ const ChatScreen(  {super.key ,required this.room   ,  required this.user} );
   
   final ChatUser user ; 
-final Room room ;
+ final Room room ;
   @override
   State<ChatScreen> createState() => _ChatScreenState();
 }
@@ -50,7 +54,7 @@ class _ChatScreenState extends State<ChatScreen> {
               children: [
                 Expanded(
                   child: StreamBuilder(
-                    stream: ctrl.getAllMessages(widget.user),
+                    stream: ctrl.getAllMessages( widget.user),
                     builder: (context, snapshot) {
                       switch (snapshot.connectionState) {
                         //if data is loading
@@ -97,21 +101,27 @@ class _ChatScreenState extends State<ChatScreen> {
                           child: CircularProgressIndicator(strokeWidth: 2))),
               
                 //chat input filed
-               ChatInput(user: widget.user);
+               ChatInput( room: widget.room, user: widget.user) ,
+               
+                 
+                              
+                               
+               
+
 
                 //show emojis on keyboard emoji button click & vice versa
-                if (_showEmoji) 
+if (_showEmoji)  
                   SizedBox(
                     height: mq.height * .35,
                     child: EmojiPicker(
-                      textEditingController: ctrl.inp 
+                      textEditingController: ctrl.inp ,
                       config: Config(
                         bgColor: const Color.fromARGB(255, 234, 248, 255),
                         columns: 8,
                         emojiSizeMax: 32 * (Platform.isIOS ? 1.30 : 1.0),
                       ),
                     ),
-                  )
+                  ) 
               ],
             ),
           ),
@@ -123,4 +133,4 @@ class _ChatScreenState extends State<ChatScreen> {
   
   }
 }
- */
+ 

@@ -11,9 +11,13 @@ import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:image_picker/image_picker.dart'; 
 import 'package:revi/model/chat-user.dart'; 
 import 'package:revi/model/message.dart' ;
+
+import '../../../model/Room.dart';
 class ChatInput extends StatefulWidget {
-  const ChatInput({super.key ,required this.user}); 
- final ChatUser user ;
+  const ChatInput({super.key ,required this.user ,required this.room}); 
+ final ChatUser user ;  
+final  Room room ;
+
 
   @override
   State<ChatInput> createState() => _ChatInputState();
@@ -74,7 +78,7 @@ class _ChatInputState extends State<ChatInput> {
                         for (var i in images) {
                           log('Image Path: ${i.path}');
                           setState(() => _isUploading = true);
-                          await ctrl.sendChatImage(widget.user, File(i.path));
+                          await ctrl.sendChatImage(widget.room , widget.user, File(i.path));
                           setState(() => _isUploading = false);
                         }
                       },
@@ -93,7 +97,7 @@ class _ChatInputState extends State<ChatInput> {
                           log('Image Path: ${image.path}');
                           setState(() => _isUploading = true);
 
-                          await ctrl.sendChatImage(
+                          await ctrl.sendChatImage( widget.room ,
                               widget.user, File(image.path));
                           setState(() => _isUploading = false);
                         }
@@ -112,7 +116,7 @@ class _ChatInputState extends State<ChatInput> {
           MaterialButton(
             onPressed: () {
               if (inp.text.isNotEmpty) {
-               ctrl.sendMessage(widget.user, inp.text, Type.text);
+               ctrl.sendMessage(widget.room,widget.user, inp.text, Type.text);
                 inp.text = '';
               }
             },

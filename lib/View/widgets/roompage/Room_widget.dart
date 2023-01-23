@@ -3,7 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
 import 'package:revi/controller/Roompaes_controller/roompage_controller.dart';    
-import 'package:revi/model/Room.dart' ; 
+import 'package:revi/model/Room.dart' ;
+import 'package:revi/model/chat-user.dart';
+import 'package:revi/routing/router_const.dart';
+
+import '../../screens/chatRoom/chatscreen.dart'; 
 
 
 
@@ -12,18 +16,22 @@ import 'package:revi/model/Room.dart' ;
 
 
 
- class RoomCard extends StatelessWidget{
+ class RoomCard extends StatefulWidget{
   const RoomCard( {super.key, 
   
-  required this.room
+  required this.room,  
+required this.user
   
   }
   );  
-  final Room room ;
-   
+  final Room room ;  
+  final ChatUser user ;
 
+  @override
+  State<RoomCard> createState() => _RoomCardState();
+}
 
-
+class _RoomCardState extends State<RoomCard> {
   @override
   Widget build(BuildContext context) { 
     RoomPageControllerImp ctrl =Get.put(RoomPageControllerImp()) ;
@@ -31,8 +39,13 @@ import 'package:revi/model/Room.dart' ;
       padding:  const EdgeInsets.symmetric(vertical: 15 ,horizontal: 50) ,
       child :   
       InkWell( 
-        onTap: () {
-        
+        onTap: () {  
+
+          Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => ChatScreen(user: widget.user, room: widget.room,)));
+                
         },
       child :
       Slidable(
@@ -64,7 +77,7 @@ import 'package:revi/model/Room.dart' ;
             
           
           onTap: (() {
-             
+            Get.toNamed(Approuter.chatScreen) ;
           } ) , 
 
           child:  Column( 
@@ -87,7 +100,7 @@ import 'package:revi/model/Room.dart' ;
 
             ) ,
            Text( 
-             room.roomname , 
+             widget.room.roomname , 
              style: const  TextStyle( 
               fontSize: 20, 
               fontWeight: FontWeight.bold ),
@@ -111,7 +124,7 @@ import 'package:revi/model/Room.dart' ;
 
             ),
         SelectableText( 
-             room.token ,
+             widget.room.token ,
              style: const  TextStyle( 
               fontSize: 16, 
                )

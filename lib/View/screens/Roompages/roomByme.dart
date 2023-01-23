@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -10,16 +11,20 @@ import 'package:revi/View/widgets/roompage/Room_widget.dart';
 import 'package:revi/View/widgets/roompage/textformfield.dart';
 import 'package:revi/controller/Roompaes_controller/roompage_controller.dart'; 
 import 'package:revi/controller/Roompaes_controller/validator.dart';
-import 'package:revi/data/datasource/local_storage/lcoal_storage_respostior.dart'; 
+import 'package:revi/data/datasource/local_storage/lcoal_storage_respostior.dart';
+import 'package:revi/model/chat-user.dart'; 
 import 'package:revi/model/token.dart';
 
 import '../../../model/Room.dart';
 
 
  class RoomPageBM extends StatefulWidget {
-  const RoomPageBM({super.key  ,
+  const RoomPageBM({super.key  ,  
+
+ required this.user
        
-  });
+  }); 
+final ChatUser user ;
 
 
   @override
@@ -90,6 +95,7 @@ String name ="" ;
     roomPageController.roomname.clear();   
     
       roomPageController.addroom(name ,passwod)  ;
+      roomPageController.addtoMyroomsAdmin(name, passwod) ;
  
   } );  
   
@@ -133,7 +139,7 @@ String name ="" ;
                             physics: const BouncingScrollPhysics(), 
                             itemCount: _list.length,
                             itemBuilder: (context, index) {
-                               return RoomCard(room: _list[index]) ;
+                               return RoomCard(room: _list[index] ,user: widget.user , ) ;
 
                             }
 

@@ -2,6 +2,8 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:revi/controller/auth/auth_controller.dart';
+import 'package:revi/home.dart';
+import 'package:revi/model/chat-user.dart';
 import 'package:revi/routing/router_const.dart';
 import 'package:revi/view/widgets/auth/emailField.dart';
 
@@ -14,9 +16,12 @@ import 'package:get/get.dart';
 
 
 class SignIn extends StatefulWidget {
-  const SignIn({Key? key}):super(key: key);
+  const SignIn({Key? key, 
+  required this.user 
+  
+  }):super(key: key);
 
- 
+ final ChatUser user ;
 
   @override
   State<SignIn> createState() => _SignInState();
@@ -26,8 +31,9 @@ class _SignInState extends State<SignIn> {
 late TextEditingController emailcontroller =TextEditingController() ; 
 late TextEditingController passwordcontroller =TextEditingController() ; 
 late TextEditingController usernameC =TextEditingController() ;
-  bool passwordVisibility = true;   
- 
+  bool passwordVisibility = true;
+  
+  
   @override 
   void dispose() {
     emailcontroller.dispose() ;
@@ -226,10 +232,13 @@ late TextEditingController usernameC =TextEditingController() ;
 
     if (obj is User) { 
      await   AuthController.createUser(usern).then((value) { 
-      Get.toNamed(Approuter.home) ; 
-    });
-      
-    } else {
+        Get.toNamed(Approuter.home) ;
+     }
+        
+        );
+     
+    }
+  else {
       await showOkAlertDialog(
         context: context,
         message: obj,
