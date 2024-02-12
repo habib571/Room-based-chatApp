@@ -5,10 +5,17 @@ import 'package:get/get.dart';
 import 'package:revi/controller/chatRoom/chatRoom_controller.dart';
 import 'package:revi/model/Date.dart';
 import 'package:revi/model/message.dart';
-class BlueMessage extends StatefulWidget {
-   BlueMessage({super.key }); 
-  
-late Message _message ;
+
+import '../../../model/Room.dart';
+class BlueMessage extends StatefulWidget { 
+
+   BlueMessage({super.key , 
+   required this.romm , 
+   required this.message
+   }); 
+Room romm ;
+final Message message ; 
+
   @override
   State<BlueMessage> createState() => _BlueMessageState();
 }
@@ -18,8 +25,8 @@ class _BlueMessageState extends State<BlueMessage> {
   ChatRoomcontroller ctr = Get.put(ChatRoomcontroller()) ;
   @override
   Widget build(BuildContext context) { 
-    if(widget._message.read.isNotEmpty) {
- ChatRoomcontroller.updateMessageReadStatus(widget._message) ;
+    if(widget.message.read.isNotEmpty) {
+ctr.updateMessageReadStatus(widget.message , widget.romm) ;
     }
   return  Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -27,7 +34,7 @@ class _BlueMessageState extends State<BlueMessage> {
         //message content
         Flexible(
           child: Container(
-            padding: EdgeInsets.all(widget._message.type == Type.image
+            padding: EdgeInsets.all(widget.message.type == Type.image
                 ? 100
                 : 100),
             margin: const EdgeInsets.symmetric(
@@ -40,11 +47,11 @@ class _BlueMessageState extends State<BlueMessage> {
                     topLeft: Radius.circular(30),
                     topRight: Radius.circular(30),
                     bottomRight: Radius.circular(30))),
-            child: widget._message.type == Type.text
+            child: widget.message.type == Type.text
                 ?
                 //show text
                 Text(
-                    widget._message.msg,
+                    widget.message.msg,
                     style: const TextStyle(fontSize: 15, color: Colors.black87),
                   )
                 :
@@ -52,7 +59,7 @@ class _BlueMessageState extends State<BlueMessage> {
                 ClipRRect(
                     borderRadius: BorderRadius.circular(15),
                     child: CachedNetworkImage(
-                      imageUrl: widget._message.msg,
+                      imageUrl: widget.message.msg,
                       placeholder: (context, url) => const Padding(
                         padding: EdgeInsets.all(8.0),
                         child: CircularProgressIndicator(strokeWidth: 2),
@@ -69,7 +76,7 @@ class _BlueMessageState extends State<BlueMessage> {
           padding: const EdgeInsets.only(right: 20),
           child: Text(
             MyDate.getFormattedTime(
-                context: context, time: widget._message.sent),
+                context: context, time: widget.message.sent),
             style: const TextStyle(fontSize: 13, color: Colors.black54),
           ),
         ),

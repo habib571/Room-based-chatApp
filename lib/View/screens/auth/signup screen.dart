@@ -1,5 +1,5 @@
 
-
+/*
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
@@ -13,7 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:revi/view/widgets/auth/passwordFiled.dart';  
 import 'package:revi/view/widgets/auth/myTextButton.dart'; 
 import 'package:adaptive_dialog/adaptive_dialog.dart'; 
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 class Signup extends StatefulWidget {
   const Signup({Key? key , 
@@ -232,3 +232,4 @@ class _SignupState extends State<Signup> {
   
 }
 
+*/

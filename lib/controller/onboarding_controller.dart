@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart'; 
 import 'package:revi/data/datasource/static/static.dart';
 import 'package:revi/routing/router_const.dart';
-import 'package:revi/services/services.dart';
+
 
 abstract class OnboardingController extends GetxController { 
   next() ; 

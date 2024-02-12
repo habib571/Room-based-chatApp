@@ -23,7 +23,7 @@ class SplashScreen extends StatelessWidget {
              Get.toNamed(Approuter.home) ;
             });
           } else {
-            return _getScreen(context);
+            return _getScreen();
           }
         }
         return const Center(
@@ -32,7 +32,7 @@ class SplashScreen extends StatelessWidget {
       },
     ));
   }
-  _getScreen(BuildContext context) {
+  _getScreen() {
     return 
     Center(child: 
     TextButton( 

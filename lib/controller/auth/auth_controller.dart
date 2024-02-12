@@ -1,8 +1,12 @@
 
 
 
+import 'dart:developer';
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 
 import 'package:flutter/material.dart'; 
@@ -12,9 +16,17 @@ import 'package:revi/model/chat-user.dart';
 //import 'package:revi/routing/router_const.dart';
 class AuthController  {  
   static final FirebaseFirestore firestore =FirebaseFirestore.instance ;
-  
- static final FirebaseAuth firebaseAuth = FirebaseAuth.instance; 
-   static User get user =>firebaseAuth.currentUser!;
+  static final FirebaseAuth firebaseAuth = FirebaseAuth.instance; 
+  static User get user =>firebaseAuth.currentUser!; 
+  static FirebaseStorage storage = FirebaseStorage.instance;
+ 
+ static  ChatUser me =  ChatUser(
+    image: user.photoURL.toString(),
+     name: user.displayName.toString()  ,
+     email:  user.email.toString() ,
+     id: user.uid
+     ) ;
+
 
   static Future<dynamic> signUp(String email, String password) async {
     try {
@@ -54,7 +66,7 @@ class AuthController  {
   }
 
   static User? currentUser() {
-    return FirebaseAuth.instance.currentUser;
+    return FirebaseAuth.instance.currentUser ;
   }  
    getProfilEmailImage()  {
     if(firebaseAuth.currentUser!.photoURL !=null) {
@@ -63,12 +75,13 @@ class AuthController  {
       return const Icon(Icons.account_circle) ;
     }
    } 
-  static Future<void> createUser(String name)  async { 
+  static Future<void> createUser()  async { 
     final chatUser =ChatUser(
-      name: name,
+      name: user.displayName.toString(),
        email: user.email.toString(),
-        id:  user.uid
-        ); 
+        id:  user.uid , 
+        image: user.photoURL.toString()
+        );  
        return await  firestore 
         .collection('users')
         .doc(user.uid) 
@@ -76,10 +89,50 @@ class AuthController  {
         
 
 
-   }
+   } 
+      static Future<bool> userExists() async {
+
+    return (await firestore.collection('users').doc(user.uid).get()).exists;
+  }
+ static Future<void> updateUserInfo() async {
+    await firestore.collection('users').doc(user.uid).update({
+      'name': me.name,
+    });
+  } 
+
+    static Future<void> updateProfilePicture(File file) async {
+    //getting image file extension
+    final ext = file.path.split('.').last;
+    log('Extension: $ext');
+
+    //storage file ref with path
+    final ref = storage.ref().child('profile_pictures/${user.uid}.$ext');
+
+    //uploading image
+    await ref
+        .putFile(file, SettableMetadata(contentType: 'image/$ext'))
+        .then((p0) {
+      log('Data Transferred: ${p0.bytesTransferred / 1000} kb'); 
+      
+    } 
+  
+    );
+   me.image = await ref.getDownloadURL();
+    await firestore
+        .collection('users')
+        .doc(user.uid)
+        .update({'image': me.image});
 
 
-} 
+}  
 
+
+static Stream<DocumentSnapshot<Map<String, dynamic>>> getUserInfo() {
+    return firestore
+        .collection('users')
+        .doc(user.uid)
+        .snapshots() ;
+  }
+}
 
    

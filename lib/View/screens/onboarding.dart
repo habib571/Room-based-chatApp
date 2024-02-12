@@ -11,10 +11,10 @@ import 'package:get/get.dart';
   @override
   Widget build(BuildContext context) { 
     Get.put(OnboardingControllerImp()) ;
-    return Scaffold( 
+    return const Scaffold( 
       body: SafeArea(
         child:  Column(children: [ 
-          const Expanded(  
+          Expanded(  
             flex: 2,
             child: SliderOnboarding()    
             
@@ -23,7 +23,7 @@ import 'package:get/get.dart';
     Expanded( 
       flex: 1,
       child:  Column( 
-        children: const [  
+        children: [  
           ControllerOnboarding(),
         SizedBox( 
           height: 50,

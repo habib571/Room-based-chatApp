@@ -1,11 +1,11 @@
 import 'dart:math' ; 
 class GeneratedToken { 
   
-  String GenToken() {
+ static String genToken() {
   String token = '' ; 
   String letters ='azertyuiopqsdfghjklmwxcvbnAZERTYUIOPQSDFGHJKLMWXCVBN ' ; 
   String numbers = ' 123456789' ; 
-  String special = ' &{}-@])=*<>+-!?' ;    
+  String special = ' ' ;    
   for(int i=0 ;i<3 ; i++) {
     var rand = Random() ;  
     token += letters.split('')[rand.nextInt(letters.length) ] ; 
@@ -18,4 +18,4 @@ class GeneratedToken {
   return token ; 
   }
 
-}
+}  

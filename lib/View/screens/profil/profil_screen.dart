@@ -1,11 +1,15 @@
-/*import 'dart:developer';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' ;
-import 'package:image_picker/image_picker.dart';   
-import 'package:revi/model/chat-user.dart' ;
+import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:revi/constant/colors.dart';
+import 'package:revi/controller/Roompaes_controller/roompage_controller.dart';
+import 'package:revi/controller/auth/auth_controller.dart';   
+import '../../../helper/dialog.dart';
 
 class ProfilScreen extends StatefulWidget {
   const ProfilScreen({super.key});
@@ -16,13 +20,21 @@ class ProfilScreen extends StatefulWidget {
 
 class _ProfilScreenState extends State<ProfilScreen> { 
   final _formKey = GlobalKey<FormState>();
+    
   String? _image;
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) {  
+    RoomPageControllerImp ctr = Get.put(RoomPageControllerImp()) ;  
+    final usr = ctr.user ;  
+    final username = Get.arguments[0] ; 
+    final picture =Get.arguments[1] ;
+
+    final  mq = MediaQuery.of(context).size;
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(), 
       child: Scaffold( 
         appBar: AppBar(
+          backgroundColor: themecolor,
           title: const Text(
             "Profile " , 
             style: TextStyle( 
@@ -37,38 +49,36 @@ class _ProfilScreenState extends State<ProfilScreen> {
                  child: SingleChildScrollView( 
                   child:  Column(
                     children: [  
-                     const SizedBox() ,
+                     const SizedBox(height: 30,) ,
                       //user profile picture
                     Stack(
-                      children: [
-                        //profile picture
+                      children: [ 
                         _image != null
-                            ?
-
-                            //local image
-                            ClipRRect(
-                                borderRadius:
-                                    BorderRadius.circular(10),
-                                child: Image.file(File(_image!),
-                                    width: 50 ,
-                                    height:10  ,
-                                    fit: BoxFit.cover))
-                            :
-
-                            //image from server
+                            ?//local image
                             ClipRRect(
                                 borderRadius:
                                     BorderRadius.circular(mq.height * .1),
-                                child: CachedNetworkImage(
-                                  width: mq.height * .2,
-                                  height: mq.height * .2,
-                                  fit: BoxFit.cover,
-                                  imageUrl: widget.user.image,
-                                  errorWidget: (context, url, error) =>
-                                      const CircleAvatar(
-                                          child: Icon(CupertinoIcons.person)),
-                                ),
-                              ),
+                                child: Image.file(File(_image!),
+                                    width: mq.height * .2,
+                                    height: mq.height * .2,
+                                    fit: BoxFit.cover)
+                                    )
+                            :
+
+                         ClipRRect(
+                                    borderRadius:
+                                        BorderRadius.circular(mq.height * .1),
+                                    child: CachedNetworkImage(
+                                      width: mq.height * .2,
+                                      height: mq.height * .2,
+                                      fit: BoxFit.cover,
+                                      imageUrl:  picture,
+                                      errorWidget: (context, url, error) =>
+                                          const CircleAvatar(
+                                              child: Icon(CupertinoIcons.person)),
+                                    ),
+                                  ) ,
+                           
 
                         //edit image button
                         Positioned(
@@ -77,11 +87,11 @@ class _ProfilScreenState extends State<ProfilScreen> {
                           child: MaterialButton(
                             elevation: 1,
                             onPressed: () {
-                              _showBottomSheet();
+                              _showBottomSheet(mq);
                             },
                             shape: const CircleBorder(),
                             color: Colors.white,
-                            child: const Icon(Icons.edit, color: Colors.blue),
+                            child: const Icon(Icons.edit, color: themecolor),
                           ),
                         )
                       ],
@@ -91,7 +101,7 @@ class _ProfilScreenState extends State<ProfilScreen> {
                     SizedBox(height: mq.height * .03),
 
                     // user email label
-                    Text(widget.user.email,
+                    Text( usr.email?? '',
                         style: const TextStyle(
                             color: Colors.black54, fontSize: 16)),
 
@@ -99,18 +109,20 @@ class _ProfilScreenState extends State<ProfilScreen> {
                     SizedBox(height: mq.height * .05),
 
                     // name input field
-                    TextFormField(
-                      initialValue: widget.user.name,
-                      onSaved: (val) => APIs.me.name = val ?? '',
+                    TextFormField( 
+                    
+                      initialValue:  username,
+                      onSaved: (val) => AuthController.me.name = val ?? '',
                       validator: (val) => val != null && val.isNotEmpty
                           ? null
                           : 'Required Field',
+                          
                       decoration: InputDecoration(
                           prefixIcon:
-                              const Icon(Icons.person, color: Colors.blue),
+                              const Icon(Icons.person, color:themecolor),
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12)),
-                          hintText: 'eg. Happy Singh',
+                          hintText: 'eg. Foulen Foulani',
                           label: const Text('Name')),
                     ),
 
@@ -118,33 +130,22 @@ class _ProfilScreenState extends State<ProfilScreen> {
                     SizedBox(height: mq.height * .02),
 
                     // about input field
-                    TextFormField(
-                      initialValue: widget.user.about,
-                      onSaved: (val) => APIs.me.about = val ?? '',
-                      validator: (val) => val != null && val.isNotEmpty
-                          ? null
-                          : 'Required Field',
-                      decoration: InputDecoration(
-                          prefixIcon: const Icon(Icons.info_outline,
-                              color: Colors.blue),
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12)),
-                          hintText: 'eg. Feeling Happy',
-                          label: const Text('About')),
-                    ),
+          
 
                     // for adding some space
                     SizedBox(height: mq.height * .05),
 
                     // update profile button
                     ElevatedButton.icon(
+                      
                       style: ElevatedButton.styleFrom(
+                        backgroundColor: themecolor,
                           shape: const StadiumBorder(),
                           minimumSize: Size(mq.width * .5, mq.height * .06)),
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
                           _formKey.currentState!.save();
-                          APIs.updateUserInfo().then((value) {
+                          AuthController.updateUserInfo().then((value) {
                             Dialogs.showSnackbar( 
                                 context, 'Profile Updated Successfully!');
                           });
@@ -160,10 +161,9 @@ class _ProfilScreenState extends State<ProfilScreen> {
             ),
           )),
     );
-  } }
-
-  // bottom sheet for picking a profile picture for user
-  void _showBottomSheet() {
+  } 
+  
+    void _showBottomSheet(Size mq ) {
     showModalBottomSheet(
         context: context,
         shape: const RoundedRectangleBorder(
@@ -198,24 +198,25 @@ class _ProfilScreenState extends State<ProfilScreen> {
 
                         // Pick an image
                         final XFile? image =
-                            await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+                            await picker.pickImage(source: ImageSource.gallery);
                         if (image != null) {
                           log('Image Path: ${image.path}');
                           setState(() {
                             _image = image.path;
                           }); 
 
-                          APIs.updateProfilePicture(File(_image!));
+                          AuthController.updateProfilePicture(File(_image!));
                           // for hiding bottom sheet
+                          // ignore: use_build_context_synchronously
                           Navigator.pop(context);
                         }
                       },
-                      child: Image.asset('images/add_image.png')),
+                      child: const Icon(Icons.add)), 
 
                   //take picture from camera button
                   ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
+                          //backgroundColor: Colors.white,
                           shape: const CircleBorder(),
                           fixedSize: Size(mq.width * .3, mq.height * .15)),
                       onPressed: () async {
@@ -223,22 +224,29 @@ class _ProfilScreenState extends State<ProfilScreen> {
 
                         // Pick an image
                         final XFile? image =
-                            await picker.pickImage(source: ImageSource.camera, imageQuality: 80);
+                            await picker.pickImage(source: ImageSource.camera);
                         if (image != null) {
                           log('Image Path: ${image.path}');
                           setState(() {
                             _image = image.path;
                           });
 
-                          APIs.updateProfilePicture(File(_image!));
+                          AuthController.updateProfilePicture(File(_image!));
                           // for hiding bottom sheet
+                          // ignore: use_build_context_synchronously
                           Navigator.pop(context);
                         }
                       },
-                      child: Image.asset('images/camera.png')),
+                      child: const Icon(Icons.add_a_photo_rounded) ),
                 ],
               )
             ],
           );
         });
-  }*/
+  }
+  
+  
+  }
+
+  // bottom sheet for picking a profile picture for user
+  

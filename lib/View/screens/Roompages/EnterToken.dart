@@ -28,7 +28,9 @@ class EnterToken extends StatelessWidget {
         
                    children:[ 
                      Text(text),
-                    CustomTextForm(valid:(val){},hinttext: "Enter Room's token", mycontroller: null,),
+                    CustomTextForm(valid:(val){
+                      return null;
+                    },hinttext: "Enter Room's token", mycontroller: null,),
                   Materialbutton(text:"entrer",onPressed: (){
 
           

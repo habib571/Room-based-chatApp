@@ -6,7 +6,7 @@ class ButtonOnboarding extends GetView<OnboardingControllerImp> {
 
   @override
   Widget build(BuildContext context) {
-    return  Container( 
+    return  SizedBox( 
           height: 50,   
         
            child: MaterialButton(

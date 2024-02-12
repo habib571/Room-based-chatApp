@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 
 validInput( String val,int min,int max,String type){
-if(type=="roomname"){
+if(type=="roomname" ){
 
 if(!GetUtils.isUsername(val)){
   return "not valid room name";
@@ -12,7 +12,8 @@ if(!GetUtils.isUsername(val)){
 
 } 
 
-validTokenInput(String val, bool check) { 
+validTokenInput(String val, bool check) {  
+   
  if(!check) { 
    return "Check Your token " ;
  }  

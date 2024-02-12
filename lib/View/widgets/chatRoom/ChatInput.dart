@@ -1,21 +1,19 @@
 
 import 'dart:developer';
 import 'dart:io';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:revi/constant/colors.dart';
 import 'package:revi/controller/chatRoom/chatRoom_controller.dart';   
 import 'package:revi/main.dart';
-import 'package:emoji_picker_flutter/emoji_picker_flutter.dart'; 
 import 'package:image_picker/image_picker.dart'; 
 import 'package:revi/model/chat-user.dart'; 
 import 'package:revi/model/message.dart' ;
 
 import '../../../model/Room.dart';
 class ChatInput extends StatefulWidget {
-  const ChatInput({super.key ,required this.user ,required this.room}); 
- final ChatUser user ;  
+  const ChatInput({super.key  ,required this.room}); 
+
 final  Room room ;
 
 
@@ -30,6 +28,7 @@ class _ChatInputState extends State<ChatInput> {
    final inp = TextEditingController() ;
   @override
   Widget build(BuildContext context) {
+    final  mq = MediaQuery.of(context).size;
     return Padding(
       padding: EdgeInsets.symmetric(
           vertical: mq.height * .01, horizontal: mq.width * .025),
@@ -49,7 +48,7 @@ class _ChatInputState extends State<ChatInput> {
                         setState(() => _showEmoji = !_showEmoji);
                       },
                       icon: const Icon(Icons.emoji_emotions,
-                          color: Colors.blueAccent, size: 25)),
+                          color: themecolor, size: 25)),
 
                   Expanded(
                       child: TextField(
@@ -61,7 +60,7 @@ class _ChatInputState extends State<ChatInput> {
                     },
                     decoration: const InputDecoration(
                         hintText: 'Type Something...',
-                        hintStyle: TextStyle(color: Colors.blueAccent),
+                        hintStyle: TextStyle(color: themecolor),
                         border: InputBorder.none),
                   )),
 
@@ -78,12 +77,12 @@ class _ChatInputState extends State<ChatInput> {
                         for (var i in images) {
                           log('Image Path: ${i.path}');
                           setState(() => _isUploading = true);
-                          await ctrl.sendChatImage(widget.room , widget.user, File(i.path));
+                          await ctrl.sendChatImage(widget.room ,  File(i.path));
                           setState(() => _isUploading = false);
                         }
                       },
                       icon: const Icon(Icons.image,
-                          color: Colors.blueAccent, size: 26)),
+                          color :themecolor, size: 26)),
 
                   //take image from camera button
                   IconButton(
@@ -98,12 +97,12 @@ class _ChatInputState extends State<ChatInput> {
                           setState(() => _isUploading = true);
 
                           await ctrl.sendChatImage( widget.room ,
-                              widget.user, File(image.path));
+                               File(image.path));
                           setState(() => _isUploading = false);
                         }
                       },
                       icon: const Icon(Icons.camera_alt_rounded,
-                          color: Colors.blueAccent, size: 26)),
+                          color: themecolor, size: 26)),
 
                   //adding some space
                   SizedBox(width: mq.width * .02),
@@ -116,7 +115,7 @@ class _ChatInputState extends State<ChatInput> {
           MaterialButton(
             onPressed: () {
               if (inp.text.isNotEmpty) {
-               ctrl.sendMessage(widget.room,widget.user, inp.text, Type.text);
+               ctrl.sendMessage(widget.room, inp.text, Type.text);
                 inp.text = '';
               }
             },
@@ -124,7 +123,7 @@ class _ChatInputState extends State<ChatInput> {
             padding:
                 const EdgeInsets.only(top: 10, bottom: 10, right: 5, left: 10),
             shape: const CircleBorder(),
-            color: Colors.green,
+            color: themecolor,
             child: const Icon(Icons.send, color: Colors.white, size: 28),
           )
         ],

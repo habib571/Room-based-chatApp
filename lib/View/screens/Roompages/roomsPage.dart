@@ -1,19 +1,18 @@
-import 'package:flutter/material.dart';
+/*import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:revi/View/screens/Roompages/roomByme.dart';
 import 'package:revi/View/screens/Roompages/roombyothers.dart';
-import 'package:revi/model/Room.dart';
-import 'package:revi/model/chat-user.dart'; 
+
 
 
 class RoomPage extends StatefulWidget {
   const RoomPage({super.key, 
-  required this.user ,
+  //required this.user ,
 
   
   }); 
  
-   final ChatUser user ;
+   //final ChatUser user ;
 
 
   @override
@@ -91,7 +90,7 @@ class _RoomPageState extends State<RoomPage>
                 labelPadding:
                  const   EdgeInsets.only(left: 35, right: 35, top: 10, bottom: 10),
                 indicator: BoxDecoration(
-                    color: Color.fromARGB(223, 24, 109, 88),
+                    color: const  Color.fromARGB(223, 24, 109, 88),
                     borderRadius: BorderRadius.circular(20)),
                 controller: _tabController,
                 tabs:const [
@@ -102,9 +101,9 @@ class _RoomPageState extends State<RoomPage>
           ),
           Expanded(
             child: TabBarView(
-              controller: _tabController, children: [
-              RoomPageBM( user: widget.user) ,
-              RoomPageBO(user: widget.user,)
+              controller: _tabController, children: const [
+             RoomPageBM() ,
+             RoomPageBO()
           
             ]),
           )
@@ -112,4 +111,4 @@ class _RoomPageState extends State<RoomPage>
       ),
     );
   }
-}
+}*/

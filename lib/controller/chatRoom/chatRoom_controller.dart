@@ -16,31 +16,31 @@ import '../../model/message.dart';
    void dispose() { 
     inp.dispose() ;
     super.dispose();
-   }
+   } 
   
 
-     static User? get user =>AuthController.currentUser(); 
+  
+    FirebaseFirestore firestore = FirebaseFirestore.instance ;  
+     User? get user =>AuthController.currentUser(); 
    
-   
-
-   static String getConversationID(String id) => user!.uid.hashCode <= id.hashCode
+  
+  /* String getConversationID(String id) => user!.uid.hashCode <= id.hashCode
       ? '${user!.uid}_$id'
-      : '${id}_${user!.uid}';
- Stream<QuerySnapshot<Map<String, dynamic>>> getAllMessages(
-      ChatUser user) {  
-        
-          return FirebaseFirestore.instance
-      .collection('chats/${getConversationID(user.id)}/messages/')
-      .orderBy('sent', descending: true)
-            .snapshots();
-        }  
+      : '${id}_${user!.uid}';*/
+ Stream<QuerySnapshot<Map<String, dynamic>>> getAllMessages(Room room ) { 
+    
+          return 
+      firestore.collection('messages')  
+      .where('toId' , isEqualTo: room.roomname )
+
+     .snapshots(); 
+
+}  
         
 
 
   // for sending message
- Future<void> sendMessage( 
-  Room room,
-      ChatUser chatUser, String msg, Type type) async {
+ Future<void> sendMessage( Room room, String msg, Type type) async {
     //message sending time (also used as id)
     final time = DateTime.now().millisecondsSinceEpoch.toString();
 
@@ -48,42 +48,56 @@ import '../../model/message.dart';
     final Message message = Message(
         toId: room.roomname,
         msg: msg,
-        read: '',
+        read: '', 
         type: type,
         fromId: user!.uid,
-        sent: time);
+        sent: time
+        );
 
-    final ref = FirebaseFirestore.instance
-        .collection('chats/${getConversationID(chatUser.id)}/messages/');
-    await ref.doc(time).set(message.toJson());
+    firestore.
+    collection('messages')
+    .add(message.toJson()) ; 
+    update() ;
   }
 
   //update read status of message
- static Future<void> updateMessageReadStatus(Message message) async {
-    FirebaseFirestore.instance
-        .collection('chats/${getConversationID(message.fromId)}/messages/')
-        .doc(message.sent)
-        .update({'read': DateTime.now().millisecondsSinceEpoch.toString()});
+ Future<void> updateMessageReadStatus(Message message ,Room room) async {
+    final messagesQuerySnapshot =await  
+    firestore
+   .collection('messages')
+   .where('toId' , isEqualTo: room.roomname )
+   .where('fromId', isEqualTo: user!.uid).get() ; 
+     final batch = FirebaseFirestore.instance.batch();
+
+  for (final docSnapshot in messagesQuerySnapshot.docs) {
+    batch.update(docSnapshot.reference, {'read': DateTime.now().millisecondsSinceEpoch.toString()});
+  }
+ 
+  await batch.commit();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
   }
 
   //get only last message of a specific chat
    Stream<QuerySnapshot<Map<String, dynamic>>> getLastMessage(
-      ChatUser user) {
-    return FirebaseFirestore.instance
-        .collection('chats/${getConversationID(user.id)}/messages/')
-        .orderBy('sent', descending: true)
-        .limit(1)
-        .snapshots();
+      ChatUser chatUser ,Room room) {
+    return
+         firestore
+         .collection('messages')
+         .where('toId' , isEqualTo: room.roomname )
+         .where('fromId', isEqualTo: user!.uid)
+         .orderBy('sent', descending: true)
+         .limit(1)
+         .snapshots();
   }
 
   //send chat image
- Future<void> sendChatImage( Room room ,ChatUser chatUser, File file) async {
+ Future<void> sendChatImage( Room room, File file) async {
     //getting image file extension
     final ext = file.path.split('.').last;
 
     //storage file ref with path
     final ref = FirebaseStorage.instance.ref().child(
-        'images/${getConversationID(chatUser.id)}/${DateTime.now().millisecondsSinceEpoch}.$ext');
+        'images/${room.roomname}/${DateTime.now().millisecondsSinceEpoch}.$ext');
 
     //uploading image
     await ref
@@ -94,7 +108,7 @@ import '../../model/message.dart';
 
     //updating image in firestore database
     final imageUrl = await ref.getDownloadURL();
-    await sendMessage(room,chatUser, imageUrl, Type.image);
+    await sendMessage(room,imageUrl, Type.image);
   }
 }
 

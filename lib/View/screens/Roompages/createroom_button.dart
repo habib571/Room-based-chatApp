@@ -3,22 +3,24 @@
 // ignore_for_file: must_be_immutable
 
 import 'package:flutter/material.dart';
+import 'package:revi/constant/colors.dart';
 
 
 
-class createroombutton extends StatelessWidget { 
+class Createroombutton extends StatelessWidget { 
  final void Function() onPressed;
   
-   createroombutton (
+   const Createroombutton (
     {Key? key,
     required this.onPressed,
      }) : super(key: key);
 
 
-int num = 0;
+
 @override
  Widget build(BuildContext context) {
-    return  FloatingActionButton(
+    return  FloatingActionButton( 
+      backgroundColor: themecolor,
       onPressed: onPressed,
       
       tooltip: 'create a new room',

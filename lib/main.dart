@@ -3,28 +3,20 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-//import 'package:revi/controller/auth/auth_controller.dart';
-import 'package:revi/routing/router.dart'; 
-import 'View/widgets/roompage/Room_widget.dart';
-import 'firebase_options.dart'; 
-import 'package:hive/hive.dart' ;  
-import 'package:hive_flutter/hive_flutter.dart'; 
-import 'package:flutter/services.dart';
-//import 'package:revi/View/widgets/roompage/RoomCard.dart';
+import 'package:revi/View/screens/auth/signin_screen.dart';
 
-late Size mq ;
+import 'firebase_options.dart'; 
+import 'package:flutter/services.dart';
+
 
 void main() async{ 
  WidgetsFlutterBinding.ensureInitialized() ;   
- SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky); 
+ //SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky); 
  SystemChrome.setPreferredOrientations(
           [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]) ;
  await Firebase.initializeApp(
   options: DefaultFirebaseOptions.currentPlatform,
  ) ;  
- 
- 
-  
  
   
    runApp(const MyApp()); 
@@ -37,9 +29,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {    
    
-    
-  
-    return GetMaterialApp(
+   return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
@@ -51,10 +41,11 @@ class MyApp extends StatelessWidget {
         // "hot reload" (press "r" in the console where you ran "flutter run",
         // or press Run > Flutter Hot Reload in a Flutter IDE). Notice that the
         // counter didn't reset back to zero; the application is not restarted.
-        primarySwatch: Colors.green,
+       
       ),
   
-      getPages: routes,
+       home:  const LoginScreen(),
+     
     );
   }
 }

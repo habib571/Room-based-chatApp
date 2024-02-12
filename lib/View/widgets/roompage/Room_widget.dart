@@ -1,13 +1,11 @@
-
+/*
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
 import 'package:revi/controller/Roompaes_controller/roompage_controller.dart';    
 import 'package:revi/model/Room.dart' ;
-import 'package:revi/model/chat-user.dart';
 import 'package:revi/routing/router_const.dart';
 
-import '../../screens/chatRoom/chatscreen.dart'; 
 
 
 
@@ -20,12 +18,12 @@ import '../../screens/chatRoom/chatscreen.dart';
   const RoomCard( {super.key, 
   
   required this.room,  
-required this.user
+
   
   }
   );  
   final Room room ;  
-  final ChatUser user ;
+
 
   @override
   State<RoomCard> createState() => _RoomCardState();
@@ -41,10 +39,10 @@ class _RoomCardState extends State<RoomCard> {
       InkWell( 
         onTap: () {  
 
-          Navigator.push(
+         /* Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (_) => ChatScreen(user: widget.user, room: widget.room,)));
+                    builder: (_) => ChatScreen(user: widget.user, room: widget.room,)));*/
                 
         },
       child :
@@ -138,4 +136,4 @@ class _RoomCardState extends State<RoomCard> {
       ),
      ) )); 
   }
-}
+}*/

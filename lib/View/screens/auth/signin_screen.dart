@@ -1,249 +1,162 @@
-
-import 'package:adaptive_dialog/adaptive_dialog.dart';
+import 'dart:developer';
+import 'dart:io';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:revi/controller/auth/auth_controller.dart';
-import 'package:revi/home.dart';
-import 'package:revi/model/chat-user.dart';
-import 'package:revi/routing/router_const.dart';
-import 'package:revi/view/widgets/auth/emailField.dart';
-
 import 'package:flutter/material.dart';
-import 'package:revi/view/widgets/auth/passwordFiled.dart'; 
-import 'package:revi/view/widgets/auth/myTextButton.dart';  
-
-
 import 'package:get/get.dart';
+import 'package:revi/View/screens/Roompages/home.dart';
+import 'package:revi/constant/colors.dart';
+import 'package:revi/model/chat-user.dart';
 
+import '../../../controller/auth/auth_controller.dart';
+import '../../../helper/dialog.dart';
 
-class SignIn extends StatefulWidget {
-  const SignIn({Key? key, 
-  required this.user 
-  
-  }):super(key: key);
-
- final ChatUser user ;
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({
+    super.key, 
+ 
+  });
 
   @override
-  State<SignIn> createState() => _SignInState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _SignInState extends State<SignIn> {  
-late TextEditingController emailcontroller =TextEditingController() ; 
-late TextEditingController passwordcontroller =TextEditingController() ; 
-late TextEditingController usernameC =TextEditingController() ;
-  bool passwordVisibility = true;
-  
-  
-  @override 
-  void dispose() {
-    emailcontroller.dispose() ;
-    passwordcontroller.dispose() ;
-    usernameC.dispose() ;
-    super.dispose() ;
-  } 
+class _LoginScreenState extends State<LoginScreen> {
+  bool _isAnimate = false;
+ ChatUser? chatUser ;
   @override
-  Widget build(BuildContext context) { 
+  void initState() {
+    super.initState();
 
+    //for auto triggering animation
+    Future.delayed(const Duration(milliseconds: 500), () {
+      setState(() => _isAnimate = true);
+    });
+  }
 
-   
+  // handles google login button click
+  _handleGoogleBtnClick() {
+    //for showing progress bar
+    showDialog(
+        context: context,
+        builder: (_) => const Center(child: CircularProgressIndicator()));
+
+    _signInWithGoogle().then((user) async {
+      //for hiding progress bar
+      Navigator.pop(context);
+
+      if (user != null) {
+        log('\nUser: ${user.user}');
+        log('\nUserAdditionalInfo: ${user.additionalUserInfo}');
+
+        if ((await AuthController.userExists())) {
+            Get.off(()=>  
+            Homepage());
+        } else {
+             await AuthController.createUser().then((value) {
+                  Get.off(()=>   Homepage()) ;
+          });
+        }
+        }
+      } );
     
-    return Scaffold(   
-      appBar: AppBar( 
-        backgroundColor: Colors.white,  
-       
-        title: const Text('LogIn' ,style: TextStyle(fontSize: 25 ,color: Colors.black ,fontWeight: FontWeight.bold)), 
-        centerTitle: true, 
-        
-        
-      ),
-      
-      body:  
-      
-        SafeArea(  
-        
-        child: CustomScrollView(
-          slivers: [ 
-            SliverFillRemaining(  
-              hasScrollBody: false, 
-              child: Padding(
-                padding:  const EdgeInsets.symmetric( 
-                  horizontal: 30
-                ) , 
-                child: Column(  
-                
-                  crossAxisAlignment: CrossAxisAlignment.start, 
-                  children: [    
-                    const SizedBox(height: 50), 
-                    
-                   
-                  const Center(
-                    child: Image(image: AssetImage("assets/rev.png"), 
-                     width: 180 ,
-                     height: 180,
-                     alignment:Alignment.center,),
-                  ),  
-                  const  SizedBox(height: 100) ,
-                  MyTextField( 
-                      label: "Username",
-                      hintText: 'Enter your Username',
-                      inputText: TextInputType.name,
-                      textEditingController:usernameC
-                        ) , 
-                        const SizedBox( 
-                          height: 20,
-                        ) ,
-        
-                           
-                           MyTextField( 
-                            label: "E-mail",
-                            hintText: 'Enter your email',
-                             inputText: TextInputType.emailAddress,
-                              textEditingController: emailcontroller
-                            
-                              ), 
-                            const  SizedBox(  
-                              height: 13,
-                            ), 
-                          Mypasswordfield(  
-                            label: 'Password',
-                            hintText: 'Enter your password', 
-                            isPasswordVisible: passwordVisibility,
-                            ontap: () {  setState(() {
-                              passwordVisibility = !passwordVisibility ;
-                            });
-                            
-                            },
-                              textEditingController: passwordcontroller 
-                              ),  
-                              const SizedBox(height: 10),  
-                              GestureDetector(  
-                                onTap: (() {
-                                  
-                                } 
-                                ) ,
-                                child: const  Text( 
-                                  "Forget password",
-                                  style: TextStyle( 
-                                    fontWeight: FontWeight.bold, 
-                                    color: Colors.grey, 
-                                    fontSize: 15, 
+  }
 
-                                  ) ,
-                                 
-                                  
+  Future<UserCredential?> _signInWithGoogle() async {
+    try {
+      await InternetAddress.lookup('google.com');
+      // Trigger the authentication flow
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
-                              
-                              )), 
-                                 const SizedBox(height: 40),  
+      // Obtain the auth details from the request
+      final GoogleSignInAuthentication? googleAuth =
+          await googleUser?.authentication;
 
-                              MyTextButton(buttonName: 'LogIn',
-                               ontap:(){   
-                                 _signIn() ;
-                                
-                               
-                             
-                                 //AuthController.instance.goTohome ;
-                               },
-                                textcolor: Colors.white,
-                                 bgcolor: Colors.blue,
-                                 ),
-                             const SizedBox( 
-                                height: 13,
-                              ),  
-                              
-                              
-                                
-                                 Row( 
-                                  
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  // ignore: prefer_const_literals_to_create_immutables
-                                  children: [  
-                                    
-                                   
-                                    const Text("Don't have an account?" , 
-                                    style: TextStyle( 
-                                      color: Colors.black , 
-                                      fontSize: 15
-
-                                    ),
-                                    ), 
-                                    GestureDetector( 
-                                      onTap: (() { 
-                                      Get.toNamed(Approuter.signup) ;
-                                      }) , 
-                                      child:const  Text("Register", 
-                                      style: TextStyle( 
-                                        fontSize: 15, 
-                                        color: Colors.blue, 
-                                        fontWeight: FontWeight.bold
-                                      )),
-
-                                    )
-                                  ],
-                                ),
-                              
-                                
-
-
-                            
-
-
-
-
-                  ],
-
-
-                ),
-
-              
-                ),
-
-
-
-
-
-
-
-            )
-          ],
-        ),
-
-       ),
-
-
-       );
-   
-     
-  } 
-  _signIn() async {
-    var email = emailcontroller.text.trim();
-    var pw = passwordcontroller.text.trim();
-    var usern = usernameC.text.trim() ;
-
-   if (email.isEmpty || pw.isEmpty) {
-      await showOkAlertDialog(
-        context: context,
-        message: 'Check your email or password',
+      // Create a new credential
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth?.accessToken,
+        idToken: googleAuth?.idToken,
       );
-      return;
-    }
 
-    var obj =  await AuthController.signIn(email, pw);
+      // Once signed in, return the UserCredential
+      return await AuthController.firebaseAuth.signInWithCredential(credential);
+    } catch (e) {
+      log('\n_signInWithGoogle: $e');
+      Dialogs.showSnackbar(context, 'Something Went Wrong (Check Internet!)');
+      return null;
+    }
+  }
 
-    if (obj is User) { 
-     await   AuthController.createUser(usern).then((value) { 
-        Get.toNamed(Approuter.home) ;
-     }
-        
-        );
-     
-    }
-  else {
-      await showOkAlertDialog(
-        context: context,
-        message: obj,
-      );
-    }
-  } 
+  //sign out function
+  // _signOut() async {
+  //   await FirebaseAuth.instance.signOut();
+  //   await GoogleSignIn().signOut();
+  // }
+
+  @override
+  Widget build(BuildContext context) {
+    //initializing media query (for getting device screen size)
+   final  mq = MediaQuery.of(context).size;
+
+    return Scaffold(
+     backgroundColor: Colors.white,
+      
+
+      //body
+      body: Stack(children: [
+        //app logo
+        AnimatedPositioned(
+            top: mq.height * .15,
+            right: _isAnimate ? mq.width * .10 : -mq.width * .5,
+            width: mq.width * .8,
+            duration: const Duration(seconds: 1),
+            child: const Column(
+              children: [
+                Image( image: AssetImage('assets/undraw_Manage_chats_re_0yoj.png')), 
+               SizedBox(height: 30,) , 
+               Text('Chats that Spark.' ,style: TextStyle(fontSize: 27 , color: themecolor),) ,
+
+              ],
+            )), 
+            //Text('Save Your Money !' ,style: TextStyle(fontSize: 27),) ,
+
+        //google login button
+        Positioned(
+            bottom: mq.height * .15,
+            left: mq.width * .05,
+            width: mq.width * .9,
+            height: mq.height * .06,
+            child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: themecolor,
+                    shape: const StadiumBorder(),
+                    elevation: 1),
+                onPressed: () {
+                  _handleGoogleBtnClick();
+                },
+
+                //google icon
+               icon: const Icon(Icons.login_sharp) ,
+               /*Image(
+                  image: const AssetImage('assets/google.png') , 
+                  height: mq.height * .03
+
+                  ) ,*/
+
+
+                //login with google label
+                label: RichText(
+                  text: const TextSpan(
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                      children: [
+                        TextSpan(text:'Login with '),
+                        TextSpan(
+                            text: 'Google',
+                            style: TextStyle(fontWeight: FontWeight.w500 ,color: Colors.white)),
+                      ]),
+                ))),
+      ]),
+    );
+  }
 }
 
