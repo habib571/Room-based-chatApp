@@ -80,7 +80,7 @@ class HomeDrawer extends StatelessWidget {
                     title: 'Logout',
                      icon: const Icon(Icons.logout_outlined),
                       ontap: () async{ 
-                        await AuthController.signOut() ; 
+                        await AuthController.signOut().then((value) => print('fdqsddqsf') ) ; 
                         Get.off(()=> const LoginScreen()) ;
                         
                       }

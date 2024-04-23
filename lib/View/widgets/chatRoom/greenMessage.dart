@@ -1,28 +1,24 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:revi/constant/colors.dart';
-import 'package:revi/model/Date.dart'; 
+import 'package:revi/model/Date.dart';
 
- import 'package:revi/model/message.dart' ; 
-  class GreenMessage extends StatefulWidget {
-  const GreenMessage({super.key , 
-   required this.message }); 
+import 'package:revi/model/message.dart';
 
-final  Message message ;
+class GreenMessage extends StatefulWidget {
+  const GreenMessage({super.key, required this.message});
+
+  final Message message;
 
   @override
   State<GreenMessage> createState() => _GreenMessageState();
-} 
+}
 
-class _GreenMessageState extends State<GreenMessage> { 
-
-
- 
-  @override 
-  
-  Widget build(BuildContext context) {  
+class _GreenMessageState extends State<GreenMessage> {
+  @override
+  Widget build(BuildContext context) {
     //ChatRoomcontroller ctrl = Get.put(ChatRoomcontroller()) ;
-   
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -30,7 +26,7 @@ class _GreenMessageState extends State<GreenMessage> {
         Row(
           children: [
             //for adding some space
-         const    SizedBox(width: 100),
+            const SizedBox(width: 100),
 
             //double tick blue icon for message read
             if (widget.message.read.isNotEmpty)
@@ -51,11 +47,8 @@ class _GreenMessageState extends State<GreenMessage> {
         //message content
         Flexible(
           child: Container(
-            padding: EdgeInsets.all(widget.message.type == Type.image
-                ? 2
-                : 15),
-            margin: const   EdgeInsets.symmetric(
-                horizontal: 30, vertical: 40),
+            padding: EdgeInsets.all(widget.message.type == Type.image ? 2 : 15),
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
             decoration: BoxDecoration(
                 color: themecolor,
                 border: Border.all(color: themecolor),
@@ -69,10 +62,10 @@ class _GreenMessageState extends State<GreenMessage> {
                 //show text
                 Text(
                     widget.message.msg,
-                    style: const TextStyle( 
-                      fontWeight: FontWeight.w400,
-                      fontSize: 15,
-                     color: Colors.white),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w400,
+                        fontSize: 15,
+                        color: Colors.white),
                   )
                 :
                 //show image

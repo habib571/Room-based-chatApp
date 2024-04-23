@@ -26,14 +26,28 @@ class _LoginScreenState extends State<LoginScreen> {
  ChatUser? chatUser ;
   @override
   void initState() {
-    super.initState();
-
+    super.initState(); 
+   
+  // isUserExist() ;
     //for auto triggering animation
     Future.delayed(const Duration(milliseconds: 500), () {
       setState(() => _isAnimate = true);
     });
   }
-
+ isUserExist() async {   
+     Future.delayed(const Duration(seconds: 2) , () async{
+       if( await AuthController.firebaseAuth.currentUser !=null ) {  
+      log('user exist') ;
+       Get.off(()=>  
+            Homepage());
+       
+    } 
+    else { 
+      Get.off(()=>const LoginScreen()) ;
+    }
+     }) ;
+    
+ }
   // handles google login button click
   _handleGoogleBtnClick() {
     //for showing progress bar
@@ -82,6 +96,7 @@ class _LoginScreenState extends State<LoginScreen> {
       return await AuthController.firebaseAuth.signInWithCredential(credential);
     } catch (e) {
       log('\n_signInWithGoogle: $e');
+      // ignore: use_build_context_synchronously
       Dialogs.showSnackbar(context, 'Something Went Wrong (Check Internet!)');
       return null;
     }

@@ -35,8 +35,8 @@ ctr.updateMessageReadStatus(widget.message , widget.romm) ;
         Flexible(
           child: Container(
             padding: EdgeInsets.all(widget.message.type == Type.image
-                ? 100
-                : 100),
+                ? 2
+                : 15),
             margin: const EdgeInsets.symmetric(
                 horizontal: 40, vertical: 20),
             decoration: BoxDecoration(
@@ -44,9 +44,9 @@ ctr.updateMessageReadStatus(widget.message , widget.romm) ;
                 border: Border.all(color: Colors.lightBlue),
                 //making borders curved
                 borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(30),
-                    topRight: Radius.circular(30),
-                    bottomRight: Radius.circular(30))),
+                    topLeft: Radius.circular(15),
+                    topRight: Radius.circular(15),
+                    bottomRight: Radius.circular(15))),
             child: widget.message.type == Type.text
                 ?
                 //show text

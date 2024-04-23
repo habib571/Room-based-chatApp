@@ -5,9 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:revi/constant/colors.dart';
 import 'package:revi/controller/chatRoom/chatRoom_controller.dart';   
-import 'package:revi/main.dart';
 import 'package:image_picker/image_picker.dart'; 
-import 'package:revi/model/chat-user.dart'; 
 import 'package:revi/model/message.dart' ;
 
 import '../../../model/Room.dart';

@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -34,8 +33,18 @@ abstract class RoomPageController extends GetxController {
   final verifToken = TextEditingController();
 }
 
-class RoomPageControllerImp extends RoomPageController {
-  User get user => AuthController.currentUser()!;
+class RoomPageControllerImp extends RoomPageController {  
+  @override
+  void onInit() { 
+  
+     
+    super.onInit();
+  }
+
+
+
+  User get user => AuthController.currentUser()!; 
+
 
   GlobalKey<FormState> formstate = GlobalKey<FormState>();
 
@@ -130,7 +139,7 @@ class RoomPageControllerImp extends RoomPageController {
         .doc(user.uid)
         .collection('myrooms')
         .where('token', isEqualTo: room.token)
-        .get();
+        .get(); 
     final batch = FirebaseFirestore.instance.batch();
     for (final docSnapshot in messagequery.docs) {
       batch.delete(docSnapshot.reference);
