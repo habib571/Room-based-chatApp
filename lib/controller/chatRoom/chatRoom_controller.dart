@@ -7,7 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:revi/controller/auth/auth_controller.dart';
 import 'package:revi/model/Room.dart';
-import 'package:revi/model/chat-user.dart';
+import 'package:revi/model/chatuser.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import '../../model/message.dart';
 
@@ -19,21 +19,51 @@ class ChatRoomcontroller extends GetxController {
     super.dispose();
   }
 
+  @override
+  void onInit() {
+ getCurrentUser() ;
+    super.onInit();
+  }
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   User? get user => AuthController.currentUser();
+   getCurrentUser()  async{
+     log('hfzolsehfnozresfhzo ${user!.uid}') ;
+   final docSnapshot =
+   await  firestore.collection('users').doc(user!.uid).get();
+   chatUser = ChatUser.fromJson(docSnapshot.data()!);
 
-  /* String getConversationID(String id) => user!.uid.hashCode <= id.hashCode
-      ? '${user!.uid}_$id'
-      : '${id}_${user!.uid}';*/
+  }
+
+
+ChatUser? chatUser ;
+
   Stream<QuerySnapshot<Map<String, dynamic>>> getAllMessages(Room room) {
     return firestore
         .collection('messages')
         .where('toId', isEqualTo: room.roomname)
+        .orderBy('sent', descending: true)
         .snapshots();
   }
 
   // for sending message
-    sendMessage(Room room, String msg, Type type)  {
+  updateLastMessage(Room room, String message) async {
+    final time = DateTime.now().millisecondsSinceEpoch.toString();
+    final messagequery = await firestore
+        .collection('users')
+        .doc(user!.uid)
+        .collection('myrooms')
+        .where('token', isEqualTo: room.token)
+        .get();
+    final batch = FirebaseFirestore.instance.batch();
+    for (final docSnapshot in messagequery.docs) {
+      batch.update(
+          docSnapshot.reference, {'lastMsgTime': time, 'lastMessage': message});
+    }
+    await batch.commit();
+    update();
+  }
+
+  sendMessage(Room room, String msg, Type type) {
     //message sending time (also used as id)
     final time = DateTime.now().millisecondsSinceEpoch.toString();
 
@@ -41,61 +71,46 @@ class ChatRoomcontroller extends GetxController {
     final Message message = Message(
         toId: room.roomname,
         msg: msg,
-        read: '',
+        senderName: chatUser!.name,
+        read: false,
+        readTime: '',
         type: type,
         fromId: user!.uid,
         sent: time);
 
     firestore.collection('messages').add(message.toJson());
+    updateLastMessage(room, message.msg);
     update();
   }
 
-  //update read status of message
-  Future<void> updateMessageReadStatus(Message message, Room room) async {
+  Future<void> updateMessageReadStatus(
+      Message message, Room room, String userId) async {
     final messagesQuerySnapshot = await firestore
         .collection('messages')
         .where('toId', isEqualTo: room.roomname)
-        .where('fromId', isEqualTo: user!.uid)
+        .where('fromId', isEqualTo: userId)
         .get();
     final batch = FirebaseFirestore.instance.batch();
 
     for (final docSnapshot in messagesQuerySnapshot.docs) {
-      batch.update(docSnapshot.reference,
-          {'read': DateTime.now().millisecondsSinceEpoch.toString()});
+      batch.update(docSnapshot.reference, {'read': true});
     }
 
     await batch.commit();
   }
 
-  //get only last message of a specific chat
-  Stream<QuerySnapshot<Map<String, dynamic>>> getLastMessage(
-      ChatUser chatUser, Room room) {
-    return firestore
-        .collection('messages')
-        .where('toId', isEqualTo: room.roomname)
-        .where('fromId', isEqualTo: user!.uid)
-        .orderBy('sent', descending: true)
-        .limit(1)
-        .snapshots();
-  }
-
-  //send chat image
   Future<void> sendChatImage(Room room, File file) async {
-    //getting image file extension
     final ext = file.path.split('.').last;
 
-    //storage file ref with path
     final ref = FirebaseStorage.instance.ref().child(
         'images/${room.roomname}/${DateTime.now().millisecondsSinceEpoch}.$ext');
 
-    //uploading image
     await ref
         .putFile(file, SettableMetadata(contentType: 'image/$ext'))
         .then((p0) {
       log('Data Transferred: ${p0.bytesTransferred / 1000} kb');
     });
 
-    //updating image in firestore database
     final imageUrl = await ref.getDownloadURL();
     await sendMessage(room, imageUrl, Type.image);
   }

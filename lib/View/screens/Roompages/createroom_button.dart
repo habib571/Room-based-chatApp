@@ -1,6 +1,7 @@
 // ignore_for_file: must_be_immutable
 
 import 'package:flutter/material.dart';
+import 'package:revi/View/styles/colors.dart';
 import 'package:revi/constant/colors.dart';
 
 class Createroombutton extends StatelessWidget {
@@ -14,10 +15,10 @@ class Createroombutton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton(
-      backgroundColor: themecolor,
+      backgroundColor: AppColors.primaryColor ,
       onPressed: onPressed,
       tooltip: 'create a new room',
-      child: const Icon(Icons.group_add_rounded),
+      child: const Icon(Icons.chat ,color: Colors.white,),
     );
   }
 }

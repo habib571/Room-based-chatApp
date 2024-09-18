@@ -7,7 +7,7 @@ import 'package:flutter/material.dart' ;
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:revi/constant/colors.dart';
-import 'package:revi/controller/Roompaes_controller/roompage_controller.dart';
+import 'package:revi/controller/Roomscontroller/roompage_controller.dart';
 import 'package:revi/controller/auth/auth_controller.dart';   
 import '../../../helper/dialog.dart';
 

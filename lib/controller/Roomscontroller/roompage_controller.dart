@@ -8,12 +8,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:revi/model/Room.dart';
+import '../../model/chatuser.dart';
 import '../../model/token.dart';
 import '../auth/auth_controller.dart';
 
 abstract class RoomPageController extends GetxController {
-  addroom(String name, token);
-  addtoMyrooms(String name, token, bool admin);
+  addroom(String name, token, String imgUrl);
+  addtoMyrooms(String name, token, bool admin, String imgUrl);
   Stream<QuerySnapshot<Map<String, dynamic>>> getRoomInfo(Room room);
   Future<void> deleteRoom(Room room);
 
@@ -24,6 +25,7 @@ abstract class RoomPageController extends GetxController {
   Future<void> join();
   bool checkToken();
   Future<void> updateRoomPicture(File file, Room room);
+  Stream<QuerySnapshot<Map<String, dynamic>>> getRoomUsers(String token) ;
 
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   FirebaseStorage storage = FirebaseStorage.instance;
@@ -31,52 +33,67 @@ abstract class RoomPageController extends GetxController {
   final roomname = TextEditingController();
   final enteredtoken = TextEditingController();
   final verifToken = TextEditingController();
+  String? imageUrl;
 }
 
-class RoomPageControllerImp extends RoomPageController {  
-  @override
-  void onInit() { 
-  
-     
-    super.onInit();
-  }
+List<ChatUser> users = [];
 
-
-
-  User get user => AuthController.currentUser()!; 
-
+class RoomPageControllerImp extends RoomPageController {
+  User get user => AuthController.currentUser()!;
 
   GlobalKey<FormState> formstate = GlobalKey<FormState>();
 
   Future<void> create() async {
+    String image = '';
     final name = roomname.text;
     //Navigator.of(context).pop(name);
     final passwod = GeneratedToken.genToken();
     roomname.clear();
-    addroom(name, passwod);
-    addtoMyrooms(name, passwod, true);
+    if (imageUrl != null) {
+      final file = File(imageUrl!);
+      final ext = file.path.split('.').last;
+      log('Extension: $ext');
+
+      //storage file ref with path
+      final ref = storage.ref().child('Room_profile_pictures/${user.uid}.$ext');
+
+      //uploading image
+      await ref
+          .putFile(file, SettableMetadata(contentType: 'image/$ext'))
+          .then((p0) {
+        log('Data Transferred: ${p0.bytesTransferred / 1000} kb');
+      });
+      image = await ref.getDownloadURL();
+    }
+
+    addroom(name, passwod, image);
+    addtoMyrooms(name, passwod, true, image);
     update();
   }
 
   @override
-  Future<void> addroom(String name, token) async {
-    final room = Room(token: token, roomname: name, image: '');
+  Future<void> addroom(String name, token, String imgUrl) async {
+    final room = Room(token: token, roomname: name, image: imgUrl);
+    ChatUser chatUsr = await AuthController.getCurrentUser(user.uid);
 
-    await firestore.collection('rooms').add(room.toJson());
+    await firestore.collection('rooms').doc(token).set(room.toJson());
+      firestore.collection('rooms').doc(token).collection('chatUsers').add(chatUsr.toJson()) ;
   }
 
   @override
-  Future<void> addtoMyrooms(String name, token, bool admin) async {
+  Future<void> addtoMyrooms(
+      String name, token, bool admin, String imgUrl) async {
     final room = Room(
         isUserAdmin: admin ? true : false,
         token: token,
         roomname: name,
-        image: '');
+        image: imgUrl);
     await firestore
         .collection('users')
         .doc(user.uid)
         .collection('myrooms')
         .add(room.toJson());
+
   }
 
   @override
@@ -85,17 +102,49 @@ class RoomPageControllerImp extends RoomPageController {
         .collection('users')
         .doc(user.uid)
         .collection('myrooms')
+        .orderBy('lastMsgTime', descending: true)
         .snapshots();
+  }
+
+  markAsSeen(String toId) async {
+    final messages = await firestore
+        .collection('messages')
+        .where('fromId', isEqualTo: user.uid)
+        .where('toId', isEqualTo: toId)
+        .where('isRead', isEqualTo: false)
+        .get();
+    final batch = FirebaseFirestore.instance.batch();
+    for (final docSnapshot in messages.docs) {
+      batch.update(docSnapshot.reference, {'isRead': true});
+    }
+    await batch.commit();
+    update();
+  }
+
+  int count = 0;
+  Future<int> countUnReadMessages(Room room) async {
+    int count = 0;
+    final messages = await firestore
+        .collection('messages')
+        .where('fromId', isEqualTo: room.token)
+        .where('toId', isEqualTo: user.uid)
+        .get();
+    for (var element in messages.docs) {
+      count = element.data() as int;
+    }
+    update();
+    return count;
   }
 
   @override
   Future<void> join() async {
     final querySnapshot = await firestore.collection('rooms').get();
-
+    ChatUser chatUsr = await AuthController.getCurrentUser(user.uid);
     for (var doc in querySnapshot.docs) {
       if (verifToken.text == doc['token']) {
-        addtoMyrooms(
-            doc['roomname'].toString(), doc['token'].toString(), false);
+        addtoMyrooms(doc['roomname'].toString(), doc['token'].toString(), false,
+            doc['image']) ;
+        firestore.collection('rooms').doc(doc['token']).collection('chatUsers').add(chatUsr.toJson()) ;
       }
     }
 
@@ -138,14 +187,24 @@ class RoomPageControllerImp extends RoomPageController {
         .collection('users')
         .doc(user.uid)
         .collection('myrooms')
-        .where('token', isEqualTo: room.token)
-        .get(); 
+        .where('token', isEqualTo: room.roomname)
+        .get();
     final batch = FirebaseFirestore.instance.batch();
     for (final docSnapshot in messagequery.docs) {
       batch.delete(docSnapshot.reference);
     }
     await batch.commit();
     update();
+  }
+
+  @override
+  Stream<QuerySnapshot<Map<String, dynamic>>> getRoomUsers(String token) {
+    return  firestore.
+       collection('rooms')
+        .doc(token)
+        .collection('chatUsers')
+        .snapshots();
+
   }
 
   @override
@@ -176,6 +235,15 @@ class RoomPageControllerImp extends RoomPageController {
     }
     await batch.commit();
     update();
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> getLastMessage(Room room) {
+    return firestore
+        .collection('messages')
+        .where('toId', isEqualTo: room.roomname)
+        .orderBy('sent', descending: true)
+        .limit(1)
+        .snapshots();
   }
 
   @override

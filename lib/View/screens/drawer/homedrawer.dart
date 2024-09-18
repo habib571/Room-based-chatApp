@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:revi/View/screens/auth/signin_screen.dart';
 import 'package:revi/View/screens/profil/profil_screen.dart';
+import 'package:revi/View/styles/colors.dart';
 import 'package:revi/constant/colors.dart';
 import 'package:revi/controller/auth/auth_controller.dart';
 
@@ -36,7 +37,7 @@ class HomeDrawer extends StatelessWidget {
           children: [  
             UserAccountsDrawerHeader( 
                decoration: const BoxDecoration(
-                color: themecolor
+                color: AppColors.primaryColor
                ),
             arrowColor: themecolor,
               accountName: Text( 

@@ -5,8 +5,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:revi/View/screens/Roompages/home.dart';
+import 'package:revi/View/screens/auth/signup%20screen.dart';
+import 'package:revi/View/styles/colors.dart';
+import 'package:revi/View/styles/styles.dart';
 import 'package:revi/constant/colors.dart';
-import 'package:revi/model/chat-user.dart';
+import 'package:revi/model/chatuser.dart';
 
 import '../../../controller/auth/auth_controller.dart';
 import '../../../helper/dialog.dart';
@@ -24,7 +27,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   bool _isAnimate = false;
  ChatUser? chatUser ;
-  @override
+ /* @override
   void initState() {
     super.initState(); 
    
@@ -33,10 +36,10 @@ class _LoginScreenState extends State<LoginScreen> {
     Future.delayed(const Duration(milliseconds: 500), () {
       setState(() => _isAnimate = true);
     });
-  }
+  }*/
  isUserExist() async {   
-     Future.delayed(const Duration(seconds: 2) , () async{
-       if( await AuthController.firebaseAuth.currentUser !=null ) {  
+       Future.delayed(const Duration(seconds: 2) , () async{
+       if( AuthController.firebaseAuth.currentUser !=null ) {
       log('user exist') ;
        Get.off(()=>  
             Homepage());
@@ -67,9 +70,9 @@ class _LoginScreenState extends State<LoginScreen> {
             Get.off(()=>  
             Homepage());
         } else {
-             await AuthController.createUser().then((value) {
+           /*  await AuthController.createUser().then((value) {
                   Get.off(()=>   Homepage()) ;
-          });
+          });*/
         }
         }
       } );
@@ -102,11 +105,8 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  //sign out function
-  // _signOut() async {
-  //   await FirebaseAuth.instance.signOut();
-  //   await GoogleSignIn().signOut();
-  // }
+ final TextEditingController _emailController = TextEditingController() ;
+  final TextEditingController _passwordController = TextEditingController() ;
 
   @override
   Widget build(BuildContext context) {
@@ -114,63 +114,119 @@ class _LoginScreenState extends State<LoginScreen> {
    final  mq = MediaQuery.of(context).size;
 
     return Scaffold(
-     backgroundColor: Colors.white,
-      
+      body: Container(
+        margin: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _header(context),
+            _inputField(context),
+            _forgotPassword(context),
+            _signup(context),
+          ],
+        ),
+      ),
+    );
 
-      //body
-      body: Stack(children: [
-        //app logo
-        AnimatedPositioned(
-            top: mq.height * .15,
-            right: _isAnimate ? mq.width * .10 : -mq.width * .5,
-            width: mq.width * .8,
-            duration: const Duration(seconds: 1),
-            child: const Column(
-              children: [
-                Image( image: AssetImage('assets/undraw_Manage_chats_re_0yoj.png')), 
-               SizedBox(height: 30,) , 
-               Text('Chats that Spark.' ,style: TextStyle(fontSize: 27 , color: themecolor),) ,
+  }
 
-              ],
-            )), 
-            //Text('Save Your Money !' ,style: TextStyle(fontSize: 27),) ,
+  _header(context) {
+    return  Column(
+      children: [
+        Text(
+          "Welcome Back",
+          style: poppinsBold.copyWith(fontSize: 40)
+        ),
+        Text(
+            "Enter your credential to login" ,
+          style: poppinsRegular.copyWith(color: AppColors.secondaryTxtColor , fontSize: 16),
+        ),
+      ],
+    );
+  }
 
-        //google login button
-        Positioned(
-            bottom: mq.height * .15,
-            left: mq.width * .05,
-            width: mq.width * .9,
-            height: mq.height * .06,
-            child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: themecolor,
-                    shape: const StadiumBorder(),
-                    elevation: 1),
-                onPressed: () {
-                  _handleGoogleBtnClick();
-                },
+  _inputField(context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        TextFormField(
+          controller: _emailController,
+          decoration: InputDecoration(
+              hintText: "Email",
+              hintStyle: poppinsMedium.copyWith(fontSize: 13) ,
+              border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(18),
+                  borderSide: BorderSide.none
+              ),
+              fillColor: AppColors.accentColor ,
+              filled: true,
+              prefixIcon: const Icon(Icons.person)),
+        ),
+        const SizedBox(height: 10),
+        TextFormField(
+          controller: _passwordController,
+          decoration: InputDecoration(
+            hintText: "Password",
+            hintStyle: poppinsMedium.copyWith(fontSize: 13) ,
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(18),
+                borderSide: BorderSide.none),
+            fillColor: AppColors.accentColor ,
+            filled: true,
+            prefixIcon: const Icon(Icons.password),
+          ),
+          obscureText: true,
+        ),
+        const SizedBox(height: 60),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 70),
+          child: ElevatedButton(
+            onPressed: () {
+              AuthController.signIn(_emailController.text, _passwordController.text) ;
+            },
+            style: ElevatedButton.styleFrom(
+              shape: const StadiumBorder(),
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              backgroundColor: AppColors.primaryColor
+            ),
+            child: Text(
+              "Login",
+              style: poppinsBold.copyWith(color: Colors.white ,fontSize: 15)
+            ),
+          ),
+        )
+      ],
+    );
+  }
 
-                //google icon
-               icon: const Icon(Icons.login_sharp) ,
-               /*Image(
-                  image: const AssetImage('assets/google.png') , 
-                  height: mq.height * .03
+  _forgotPassword(context) {
+    return TextButton(
+      onPressed: () {},
+      child:  Text(
+        "Forgot password?",
+        style: poppinsBold.copyWith(color: AppColors.primaryColor , fontSize: 13)
+      ),
+    );
+  }
 
-                  ) ,*/
-
-
-                //login with google label
-                label: RichText(
-                  text: const TextSpan(
-                      style: TextStyle(color: Colors.white, fontSize: 16),
-                      children: [
-                        TextSpan(text:'Login with '),
-                        TextSpan(
-                            text: 'Google',
-                            style: TextStyle(fontWeight: FontWeight.w500 ,color: Colors.white)),
-                      ]),
-                ))),
-      ]),
+  _signup(context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+         Text(
+            "Dont have an account? " ,
+          style: poppinsSemiBold.copyWith(color: AppColors.secondaryTxtColor ,fontSize: 13 ),
+        ),
+        TextButton(
+            onPressed: () {
+              Get.to(()=>const Signup()) ;
+            },
+            child:  Text(
+              "Sign Up",
+              style:  poppinsBold.copyWith(color: AppColors.primaryColor ,fontSize: 14 ),
+            )
+        )
+      ],
     );
   }
 }

@@ -1,15 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:revi/View/screens/chatRoom/chatscreen.dart';
-import 'package:revi/controller/Roompaes_controller/roompage_controller.dart';
+import 'package:revi/View/styles/colors.dart';
+import 'package:revi/View/styles/styles.dart';
+import 'package:revi/constant/colors.dart';
+import 'package:revi/controller/Roomscontroller/roompage_controller.dart';
+import 'package:revi/helper/Date.dart';
 import 'package:revi/model/Room.dart';
-
+import '../../../model/message.dart';
 class ConversationCard extends StatelessWidget {
-  const ConversationCard({
+  ConversationCard({
     super.key,
     required this.room,
   });
   final Room room;
+
+  late int countMessages;
+  Message? _message;
+  final RoomPageControllerImp _controller = Get.put(RoomPageControllerImp());
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +36,98 @@ class ConversationCard extends StatelessWidget {
       );
     }
     RoomPageControllerImp ctr = Get.put(RoomPageControllerImp());
-    return Padding(
+    return InkWell(
+        onTap: () {
+          Get.to(ChatScreen(room: room));
+        },
+        child: StreamBuilder(
+            stream: _controller.getLastMessage(room),
+            builder: (context, snapshot) {
+              final data = snapshot.data?.docs;
+              final list =
+                  data?.map((e) => Message.fromJson(e.data())).toList() ?? [];
+              if (list.isNotEmpty) _message = list[0];
+              return SizedBox(
+                width: double.infinity,
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Row(children: [
+                    room.image != ''
+                        ? CircleAvatar(
+                            radius: 32,
+                            backgroundColor: AppColors.accentColor,
+                            backgroundImage:
+                                // ignore: unnecessary_null_comparison
+                                NetworkImage(room.image),
+                            // foregroundColor: Colors.red,
+                          )
+                        : CircleAvatar(
+                            radius: 32,
+                            backgroundColor: AppColors.accentColor,
+                            // foregroundColor: Colors.red,
+                            child: Center(
+                                child: Text(
+                              room.roomname[0].toUpperCase(),
+                              style: const TextStyle(fontSize: 25),
+                            ))),
+                    const SizedBox(
+                      width: 25,
+                    ),
+                    Expanded(
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(room.roomname,
+                                    style: poppinsBold.copyWith(fontSize: 17)),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                _message != null
+                                    ? SizedBox(
+                                        width: 150,
+                                        child: Text(
+                                          _message!.senderName !=
+                                                  _controller.user.displayName
+                                              ? '${_message!.senderName} : ${_message!.msg}'
+                                              : 'You: ${_message!.msg}',
+                                          style: _message!.read
+                                              ? poppinsMedium.copyWith(
+                                                  fontSize: 11,
+                                                  color: AppColors
+                                                      .secondaryTxtColor)
+                                              : poppinsSemiBold.copyWith(
+                                                  fontSize: 13),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                        ),
+                                      )
+                                    : const SizedBox.shrink(),
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            _message != null
+                                ? Text(
+                                    MyDate.getFormattedTime(
+                                        context: context,
+                                        time: _message!.sent),
+                                    style: poppinsSemiBold.copyWith(
+                                        fontSize: 10,
+                                        color: AppColors.secondaryTxtColor))
+                                : const SizedBox.shrink()
+                          ]),
+
+                    ),
+                  ]),
+                ),
+              );
+            }));
+
+    /*Padding(
       padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 20),
       child: InkWell(
           onTap: () {
@@ -107,6 +206,6 @@ class ConversationCard extends StatelessWidget {
               ),
             ),
           )),
-    );
+    );*/
   }
 }

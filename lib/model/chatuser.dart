@@ -15,7 +15,7 @@ class ChatUser {
     name = json['name'] ?? '';
     email =json['email']??'' ; 
     id =json['id']?? '' ;  
-    image = json['image'] ;
+    image = json['image'] ??'';
   }
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
