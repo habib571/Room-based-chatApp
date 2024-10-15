@@ -14,6 +14,7 @@ import 'package:revi/model/chatuser.dart';
 import '../../../controller/Roomscontroller/roompage_controller.dart';
 import '../../../model/Room.dart';
 import '../profil/modalbuttom.dart';
+import 'event_screen.dart';
 
 class RoomDetailsScreen extends StatefulWidget {
   const RoomDetailsScreen({super.key, required this.room});
@@ -56,8 +57,7 @@ class _RoomDetailsScreenState extends State<RoomDetailsScreen> {
               child: Stack(
                 children: [
                   _image != null
-                      ?
-                      //local image
+                      ? //local image
                       ClipRRect(
                           borderRadius: BorderRadius.circular(mq.height * .1),
                           child: Image.file(File(_image!),
@@ -178,7 +178,7 @@ class _RoomDetailsScreenState extends State<RoomDetailsScreen> {
               ) ,
 
               onTap: () {
-                Get.to(()=> RoomInfo(room: widget.room)) ;
+                Get.to(()=> CreateEventScreen(room : widget.room , isEdit: false,)) ;
               },
               title: Text(
                 'Create new Event' ,
@@ -196,7 +196,7 @@ class _RoomDetailsScreenState extends State<RoomDetailsScreen> {
               ),
               trailing: const Icon(Icons.perm_media_outlined ,color: AppColors.primaryColor,),
             ) ,
-            Divider() ,
+            const Divider() ,
             Text(
            'Members' ,
               style: poppinsBold.copyWith(fontSize: 18),

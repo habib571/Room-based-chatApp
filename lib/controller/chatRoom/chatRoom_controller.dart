@@ -21,21 +21,20 @@ class ChatRoomcontroller extends GetxController {
 
   @override
   void onInit() {
- getCurrentUser() ;
+    getCurrentUser();
     super.onInit();
   }
+
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   User? get user => AuthController.currentUser();
-   getCurrentUser()  async{
-     log('hfzolsehfnozresfhzo ${user!.uid}') ;
-   final docSnapshot =
-   await  firestore.collection('users').doc(user!.uid).get();
-   chatUser = ChatUser.fromJson(docSnapshot.data()!);
-
+  getCurrentUser() async {
+    log('hfzolsehfnozresfhzo ${user!.uid}');
+    final docSnapshot =
+        await firestore.collection('users').doc(user!.uid).get();
+    chatUser = ChatUser.fromJson(docSnapshot.data()!);
   }
 
-
-ChatUser? chatUser ;
+  ChatUser? chatUser;
 
   Stream<QuerySnapshot<Map<String, dynamic>>> getAllMessages(Room room) {
     return firestore
@@ -64,9 +63,7 @@ ChatUser? chatUser ;
   }
 
   sendMessage(Room room, String msg, Type type) {
-    //message sending time (also used as id)
     final time = DateTime.now().millisecondsSinceEpoch.toString();
-
     //message to send
     final Message message = Message(
         toId: room.roomname,
@@ -79,8 +76,64 @@ ChatUser? chatUser ;
         sent: time);
 
     firestore.collection('messages').add(message.toJson());
-    updateLastMessage(room, message.msg);
+    //  updateLastMessage(room, message.msg);
     update();
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> getEventMessage(
+      String token, String eventName) {
+    return firestore
+        .collection('rooms')
+        .doc(token)
+        .collection('events')
+        .where("name", isEqualTo: eventName)
+        .snapshots();
+  }
+
+  addParticipant(String token, String eventName) async {
+    ChatUser chatUsr = await AuthController.getCurrentUser(user!.uid);
+    firestore
+        .collection('rooms')
+        .doc(token)
+        .collection('events')
+        .doc(eventName)
+        .collection('participant')
+        .add(chatUsr.toJson());
+  }
+  Stream<QuerySnapshot<Map<String, dynamic>>> isUserParticipated(String token, String eventName) {
+    return  firestore
+        .collection('rooms')
+        .doc(token)
+        .collection('events')
+        .doc(eventName)
+        .collection('participant')
+        .where('id' , isEqualTo: user!.uid )
+        .snapshots() ;
+
+
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>>  getParticipants(String token, String eventName) {
+    return firestore
+        .collection('rooms')
+        .doc(token)
+        .collection('events')
+        .doc(eventName)
+        .collection('participant')
+        .snapshots();
+  }
+
+  Stream<DocumentSnapshot<Map<String, dynamic>>> getEventByName(String name, String token) {
+    return firestore
+        .collection('rooms')
+        .doc(token)
+        .collection('events')
+        .doc(name)
+        .snapshots() ;
+  }
+
+  Stream<DocumentSnapshot<Map<String, dynamic>>> getUserInfo(String id) {
+    return firestore.collection('users').doc(id).snapshots();
   }
 
   Future<void> updateMessageReadStatus(

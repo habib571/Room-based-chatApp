@@ -8,6 +8,7 @@ import 'package:revi/View/widgets/chatRoom/ChatInput.dart';
 import 'package:revi/View/widgets/chatRoom/messageCard.dart';
 import 'package:revi/constant/colors.dart';
 import 'package:revi/controller/chatRoom/chatRoom_controller.dart';
+import 'package:revi/model/event.dart';
 import '../../../model/Room.dart';
 import '../../../model/message.dart';
 
@@ -36,7 +37,7 @@ class _ChatScreenState extends State<ChatScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        toolbarHeight: 80,
+          toolbarHeight: 80,
           backgroundColor: const Color(0xffF7F8FB),
           automaticallyImplyLeading: false,
           flexibleSpace: ChatAppBar(room: widget.room)),

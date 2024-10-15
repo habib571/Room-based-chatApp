@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:revi/model/Room.dart';
 import '../../model/chatuser.dart';
+import '../../model/event.dart';
 import '../../model/token.dart';
 import '../auth/auth_controller.dart';
 
@@ -17,15 +18,16 @@ abstract class RoomPageController extends GetxController {
   addtoMyrooms(String name, token, bool admin, String imgUrl);
   Stream<QuerySnapshot<Map<String, dynamic>>> getRoomInfo(Room room);
   Future<void> deleteRoom(Room room);
-
+  createEvent(String token) ;
   Future<void> updateRoominfo(Room room, String tk, name);
 
   Stream<QuerySnapshot<Map<String, dynamic>>> getMyrooms();
-  Stream<DocumentSnapshot<Map<String, dynamic>>> getUserInfo();
+  Stream<DocumentSnapshot<Map<String, dynamic>>> getUserInfo(String id);
   Future<void> join();
   bool checkToken();
   Future<void> updateRoomPicture(File file, Room room);
   Stream<QuerySnapshot<Map<String, dynamic>>> getRoomUsers(String token) ;
+
 
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   FirebaseStorage storage = FirebaseStorage.instance;
@@ -34,11 +36,20 @@ abstract class RoomPageController extends GetxController {
   final enteredtoken = TextEditingController();
   final verifToken = TextEditingController();
   String? imageUrl;
+  final   eventNameController = TextEditingController() ;
+
+  final dateController = TextEditingController() ;
+
+  final timeController = TextEditingController() ;
+
+  final locationNameController = TextEditingController() ;
 }
 
 List<ChatUser> users = [];
 
 class RoomPageControllerImp extends RoomPageController {
+
+
   User get user => AuthController.currentUser()!;
 
   GlobalKey<FormState> formstate = GlobalKey<FormState>();
@@ -177,8 +188,8 @@ class RoomPageControllerImp extends RoomPageController {
   }
 
   @override
-  Stream<DocumentSnapshot<Map<String, dynamic>>> getUserInfo() {
-    return firestore.collection('users').doc(user.uid).snapshots();
+  Stream<DocumentSnapshot<Map<String, dynamic>>> getUserInfo(String id) {
+    return firestore.collection('users').doc(id).snapshots();
   }
 
   @override
@@ -261,7 +272,20 @@ class RoomPageControllerImp extends RoomPageController {
     await batch.commit();
     update();
   }
+  @override
+  createEvent(String token) async{
+    Event event = Event(
+        creatorId: user.uid, name: eventNameController.text,
+        location: locationNameController.text,
+        date: dateController.text, time: timeController.text) ;
+      await firestore.
+      collection('rooms')
+          .doc(token)
+          .collection('events')
+           .doc(eventNameController.text)
+          .set(event.toJson()) ;
 
+  }
   @override
   void dispose() {
     roomname.dispose();
@@ -269,4 +293,6 @@ class RoomPageControllerImp extends RoomPageController {
     verifToken.dispose();
     super.dispose();
   }
+
+
 }

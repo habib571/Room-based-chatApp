@@ -23,8 +23,8 @@ class Room {
     token = json['token'] ?? '';
     image = json['image'] ?? '';
     isUserAdmin = json['isUserAdmin'];
-    lastMsgTime = json['lastMsgTime'];
-    lastMessage = json['lastMessage'];
+    lastMsgTime = json['lastMsgTime']?? '';
+    lastMessage = json['lastMessage'] ??'';
     unReadMessages = json['unReadMessages'] as int;
   }
   Map<String, dynamic> toJson() {

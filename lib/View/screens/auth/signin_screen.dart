@@ -13,133 +13,102 @@ import 'package:revi/model/chatuser.dart';
 
 import '../../../controller/auth/auth_controller.dart';
 import '../../../helper/dialog.dart';
-
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({
-    super.key, 
- 
-  });
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  bool _isAnimate = false;
- ChatUser? chatUser ;
- /* @override
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>(); // Form key for validation
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  bool _isLoading = false; // To track loading state
+  ChatUser? chatUser;
+
+  @override
   void initState() {
-    super.initState(); 
-   
-  // isUserExist() ;
-    //for auto triggering animation
-    Future.delayed(const Duration(milliseconds: 500), () {
-      setState(() => _isAnimate = true);
+    super.initState();
+    isUserExist();
+  }
+
+  isUserExist() async {
+    Future.delayed(const Duration(seconds: 2), () async {
+      if (AuthController.firebaseAuth.currentUser != null) {
+        log('user exist');
+        Get.off(() => Homepage());
+      } else {
+        Get.off(() => const LoginScreen());
+      }
     });
-  }*/
- isUserExist() async {   
-       Future.delayed(const Duration(seconds: 2) , () async{
-       if( AuthController.firebaseAuth.currentUser !=null ) {
-      log('user exist') ;
-       Get.off(()=>  
-            Homepage());
-       
-    } 
-    else { 
-      Get.off(()=>const LoginScreen()) ;
-    }
-     }) ;
-    
- }
-  // handles google login button click
-  _handleGoogleBtnClick() {
-    //for showing progress bar
-    showDialog(
-        context: context,
-        builder: (_) => const Center(child: CircularProgressIndicator()));
-
-    _signInWithGoogle().then((user) async {
-      //for hiding progress bar
-      Navigator.pop(context);
-
-      if (user != null) {
-        log('\nUser: ${user.user}');
-        log('\nUserAdditionalInfo: ${user.additionalUserInfo}');
-
-        if ((await AuthController.userExists())) {
-            Get.off(()=>  
-            Homepage());
-        } else {
-           /*  await AuthController.createUser().then((value) {
-                  Get.off(()=>   Homepage()) ;
-          });*/
-        }
-        }
-      } );
-    
   }
 
-  Future<UserCredential?> _signInWithGoogle() async {
-    try {
-      await InternetAddress.lookup('google.com');
-      // Trigger the authentication flow
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-
-      // Obtain the auth details from the request
-      final GoogleSignInAuthentication? googleAuth =
-          await googleUser?.authentication;
-
-      // Create a new credential
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth?.accessToken,
-        idToken: googleAuth?.idToken,
-      );
-
-      // Once signed in, return the UserCredential
-      return await AuthController.firebaseAuth.signInWithCredential(credential);
-    } catch (e) {
-      log('\n_signInWithGoogle: $e');
-      // ignore: use_build_context_synchronously
-      Dialogs.showSnackbar(context, 'Something Went Wrong (Check Internet!)');
-      return null;
+  // Handles login button click
+  _login() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+      try {
+        await AuthController.signIn(
+          _emailController.text.trim(),
+          _passwordController.text.trim(),
+        );
+      } catch (e) {
+        log("Login failed: $e");
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
-
- final TextEditingController _emailController = TextEditingController() ;
-  final TextEditingController _passwordController = TextEditingController() ;
 
   @override
   Widget build(BuildContext context) {
-    //initializing media query (for getting device screen size)
-   final  mq = MediaQuery.of(context).size;
+    final mq = MediaQuery.of(context).size;
 
-    return Scaffold(
-      body: Container(
-        margin: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            _header(context),
-            _inputField(context),
-            _forgotPassword(context),
-            _signup(context),
-          ],
+    return Stack(
+      children: [
+        Scaffold(
+          body: Container(
+            margin: const EdgeInsets.all(24),
+            child: Form(
+              key: _formKey, // Assign form key
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _header(context),
+                  _inputField(context),
+                  _forgotPassword(context),
+                  _signup(context),
+                ],
+              ),
+            ),
+          ),
         ),
-      ),
+        if (_isLoading) // Show loading overlay if true
+          Container(
+            color: Colors.black.withOpacity(0.5),
+            child: const Center(
+              child: CircularProgressIndicator(
+                color: Colors.white,
+              ),
+            ),
+          ),
+      ],
     );
-
   }
 
   _header(context) {
-    return  Column(
+    return Column(
       children: [
+        Text("Welcome Back", style: poppinsBold.copyWith(fontSize: 40)),
         Text(
-          "Welcome Back",
-          style: poppinsBold.copyWith(fontSize: 40)
-        ),
-        Text(
-            "Enter your credential to login" ,
-          style: poppinsRegular.copyWith(color: AppColors.secondaryTxtColor , fontSize: 16),
+          "Enter your credential to login",
+          style: poppinsRegular.copyWith(color: AppColors.secondaryTxtColor, fontSize: 16),
         ),
       ],
     );
@@ -152,46 +121,62 @@ class _LoginScreenState extends State<LoginScreen> {
         TextFormField(
           controller: _emailController,
           decoration: InputDecoration(
-              hintText: "Email",
-              hintStyle: poppinsMedium.copyWith(fontSize: 13) ,
-              border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(18),
-                  borderSide: BorderSide.none
-              ),
-              fillColor: AppColors.accentColor ,
-              filled: true,
-              prefixIcon: const Icon(Icons.person)),
+            hintText: "Email",
+            hintStyle: poppinsMedium.copyWith(fontSize: 13),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(18),
+              borderSide: BorderSide.none,
+            ),
+            fillColor: AppColors.accentColor,
+            filled: true,
+            prefixIcon: const Icon(Icons.person),
+          ),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return "Please enter your email";
+            } else if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+              return "Enter a valid email";
+            }
+            return null;
+          },
         ),
         const SizedBox(height: 10),
         TextFormField(
           controller: _passwordController,
           decoration: InputDecoration(
             hintText: "Password",
-            hintStyle: poppinsMedium.copyWith(fontSize: 13) ,
+            hintStyle: poppinsMedium.copyWith(fontSize: 13),
             border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(18),
-                borderSide: BorderSide.none),
-            fillColor: AppColors.accentColor ,
+              borderRadius: BorderRadius.circular(18),
+              borderSide: BorderSide.none,
+            ),
+            fillColor: AppColors.accentColor,
             filled: true,
             prefixIcon: const Icon(Icons.password),
           ),
           obscureText: true,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return "Please enter your password";
+            } else if (value.length < 6) {
+              return "Password must be at least 6 characters long";
+            }
+            return null;
+          },
         ),
         const SizedBox(height: 60),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 70),
           child: ElevatedButton(
-            onPressed: () {
-              AuthController.signIn(_emailController.text, _passwordController.text) ;
-            },
+            onPressed: _login, // Call the login method
             style: ElevatedButton.styleFrom(
               shape: const StadiumBorder(),
               padding: const EdgeInsets.symmetric(vertical: 16),
-              backgroundColor: AppColors.primaryColor
+              backgroundColor: AppColors.primaryColor,
             ),
             child: Text(
               "Login",
-              style: poppinsBold.copyWith(color: Colors.white ,fontSize: 15)
+              style: poppinsBold.copyWith(color: Colors.white, fontSize: 15),
             ),
           ),
         )
@@ -202,9 +187,9 @@ class _LoginScreenState extends State<LoginScreen> {
   _forgotPassword(context) {
     return TextButton(
       onPressed: () {},
-      child:  Text(
+      child: Text(
         "Forgot password?",
-        style: poppinsBold.copyWith(color: AppColors.primaryColor , fontSize: 13)
+        style: poppinsBold.copyWith(color: AppColors.primaryColor, fontSize: 13),
       ),
     );
   }
@@ -213,21 +198,20 @@ class _LoginScreenState extends State<LoginScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-         Text(
-            "Dont have an account? " ,
-          style: poppinsSemiBold.copyWith(color: AppColors.secondaryTxtColor ,fontSize: 13 ),
+        Text(
+          "Don't have an account? ",
+          style: poppinsSemiBold.copyWith(color: AppColors.secondaryTxtColor, fontSize: 13),
         ),
         TextButton(
-            onPressed: () {
-              Get.to(()=>const Signup()) ;
-            },
-            child:  Text(
-              "Sign Up",
-              style:  poppinsBold.copyWith(color: AppColors.primaryColor ,fontSize: 14 ),
-            )
+          onPressed: () {
+            Get.to(() => const Signup());
+          },
+          child: Text(
+            "Sign Up",
+            style: poppinsBold.copyWith(color: AppColors.primaryColor, fontSize: 14),
+          ),
         )
       ],
     );
   }
 }
-
