@@ -4,8 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../constant/colors.dart';
-import '../../../controller/Roompaes_controller/roompage_controller.dart';
-
+import '../../../controller/Roomscontroller/roompage_controller.dart';
 import '../../../helper/dialog.dart';
 import '../../../model/Room.dart';
 import '../profil/modalbuttom.dart';
